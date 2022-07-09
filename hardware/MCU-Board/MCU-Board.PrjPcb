@@ -80,6 +80,14 @@ DItemRevisionGUID=
 GenerateClassCluster=0
 DocumentUniqueId=WOUCXUSD
 
+[GeneratedDocument1]
+DocumentPath=Project Outputs for MCU-Board\Design Rule Check - MCU-Board.html
+DItemRevisionGUID=
+
+[GeneratedDocument2]
+DocumentPath=Project Outputs for MCU-Board\Move Component(s) Origin To Grid - MCU-Board.html
+DItemRevisionGUID=
+
 [Configuration1]
 Name=Sources
 ParameterCount=0
@@ -416,6 +424,11 @@ OutputName8=Report Single Pin Nets
 OutputDocumentPath8=
 OutputVariantName8=[No Variations]
 OutputDefault8=0
+OutputType9=GOSTBOM
+OutputName9=GOST BOM
+OutputDocumentPath9=
+OutputVariantName9=[No Variations]
+OutputDefault9=0
 
 [OutputGroup7]
 Name=Other Outputs
