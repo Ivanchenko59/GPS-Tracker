@@ -80,10 +80,6 @@ DItemRevisionGUID=
 GenerateClassCluster=0
 DocumentUniqueId=ITYKNUNB
 
-[GeneratedDocument1]
-DocumentPath=Project Outputs for GPS-Board\Design Rule Check - GPS-Board.html
-DItemRevisionGUID=
-
 [Configuration1]
 Name=Sources
 ParameterCount=0
