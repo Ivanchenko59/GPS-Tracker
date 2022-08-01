@@ -26,7 +26,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "gsm.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -48,17 +48,24 @@
 /* USER CODE BEGIN Variables */
 
 /* USER CODE END Variables */
-/* Definitions for task_send_gsm */
-osThreadId_t task_send_gsmHandle;
-const osThreadAttr_t task_send_gsm_attributes = {
-  .name = "task_send_gsm",
-  .stack_size = 512 * 4,
-  .priority = (osPriority_t) osPriorityLow,
+/* Definitions for defaultTask */
+osThreadId_t defaultTaskHandle;
+const osThreadAttr_t defaultTask_attributes = {
+  .name = "defaultTask",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityNormal,
 };
 /* Definitions for task_gsm */
 osThreadId_t task_gsmHandle;
 const osThreadAttr_t task_gsm_attributes = {
   .name = "task_gsm",
+  .stack_size = 512 * 4,
+  .priority = (osPriority_t) osPriorityNormal,
+};
+/* Definitions for task_send_gsm */
+osThreadId_t task_send_gsmHandle;
+const osThreadAttr_t task_send_gsm_attributes = {
+  .name = "task_send_gsm",
   .stack_size = 512 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
@@ -68,8 +75,9 @@ const osThreadAttr_t task_gsm_attributes = {
 
 /* USER CODE END FunctionPrototypes */
 
-void start_task_send_gsm(void *argument);
+void StartDefaultTask(void *argument);
 void start_task_gsm(void *argument);
+void start_task_send_gsm(void *argument);
 
 extern void MX_USB_DEVICE_Init(void);
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
@@ -101,11 +109,14 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE END RTOS_QUEUES */
 
   /* Create the thread(s) */
-  /* creation of task_send_gsm */
-  task_send_gsmHandle = osThreadNew(start_task_send_gsm, NULL, &task_send_gsm_attributes);
+  /* creation of defaultTask */
+//  defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
 
   /* creation of task_gsm */
   task_gsmHandle = osThreadNew(start_task_gsm, NULL, &task_gsm_attributes);
+
+  /* creation of task_send_gsm */
+  task_send_gsmHandle = osThreadNew(start_task_send_gsm, NULL, &task_send_gsm_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -117,25 +128,25 @@ void MX_FREERTOS_Init(void) {
 
 }
 
-/* USER CODE BEGIN Header_start_task_send_gsm */
+/* USER CODE BEGIN Header_StartDefaultTask */
 /**
-  * @brief  Function implementing the task_send_gsm thread.
-  * @param  argument: Not used
-  * @retval None
-  */
-/* USER CODE END Header_start_task_send_gsm */
-void start_task_send_gsm(void *argument)
-{
-  /* init code for USB_DEVICE */
-  MX_USB_DEVICE_Init();
-  /* USER CODE BEGIN start_task_send_gsm */
-  /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
-  }
-  /* USER CODE END start_task_send_gsm */
-}
+* @brief Function implementing the defaultTask thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartDefaultTask */
+//void StartDefaultTask(void *argument)
+//{
+//  /* init code for USB_DEVICE */
+//  MX_USB_DEVICE_Init();
+//  /* USER CODE BEGIN StartDefaultTask */
+////  /* Infinite loop */
+////  for(;;)
+////  {
+////    osDelay(1);
+////  }
+//  /* USER CODE END StartDefaultTask */
+//}
 
 /* USER CODE BEGIN Header_start_task_gsm */
 /**
@@ -147,12 +158,35 @@ void start_task_send_gsm(void *argument)
 void start_task_gsm(void *argument)
 {
   /* USER CODE BEGIN start_task_gsm */
+	gsm_init();
+	gsm_power(true);
   /* Infinite loop */
   for(;;)
   {
-    osDelay(1);
+	  gsm_loop();
+	  osDelay(1);
   }
   /* USER CODE END start_task_gsm */
+}
+
+/* USER CODE BEGIN Header_start_task_send_gsm */
+/**
+  * @brief  Function implementing the task_send_gsm thread.
+  * @param  argument: Not used
+  * @retval None
+  */
+/* USER CODE END Header_start_task_send_gsm */
+void start_task_send_gsm(void *argument)
+{
+  /* USER CODE BEGIN start_task_send_gsm */
+	gsm_waitForRegister(30);
+	gsm_msg_send("+380666874820", "TEST MSG 1");
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(10000);
+  }
+  /* USER CODE END start_task_send_gsm */
 }
 
 /* Private application code --------------------------------------------------*/

@@ -1,7 +1,7 @@
 #MicroXplorer Configuration settings - do not modify
 FREERTOS.FootprintOK=true
 FREERTOS.IPParameters=Tasks01,configUSE_NEWLIB_REENTRANT,FootprintOK
-FREERTOS.Tasks01=task_send_gsm,8,512,start_task_send_gsm,Default,NULL,Dynamic,NULL,NULL;task_gsm,24,512,start_task_gsm,Default,NULL,Dynamic,NULL,NULL
+FREERTOS.Tasks01=defaultTask,24,128,StartDefaultTask,Default,NULL,Dynamic,NULL,NULL;task_gsm,24,512,start_task_gsm,Default,NULL,Dynamic,NULL,NULL;task_send_gsm,24,512,start_task_send_gsm,Default,NULL,Dynamic,NULL,NULL
 FREERTOS.configUSE_NEWLIB_REENTRANT=1
 File.Version=6
 GPIO.groupedBy=Group By Peripherals
@@ -68,6 +68,7 @@ NVIC.SysTick_IRQn=true\:15\:0\:false\:false\:false\:true\:false\:true
 NVIC.TIM1_TRG_COM_TIM11_IRQn=true\:15\:0\:false\:false\:true\:false\:false\:true
 NVIC.TimeBase=TIM1_TRG_COM_TIM11_IRQn
 NVIC.TimeBaseIP=TIM11
+NVIC.USART2_IRQn=true\:5\:0\:false\:false\:true\:true\:true\:true
 NVIC.UsageFault_IRQn=true\:0\:0\:false\:false\:true\:false\:false\:false
 PA10.Locked=true
 PA10.Mode=Asynchronous
