@@ -78,8 +78,6 @@ void Error_Handler(void);
 #define W25_MISO_GPIO_Port GPIOA
 #define W25_MOSI_Pin GPIO_PIN_7
 #define W25_MOSI_GPIO_Port GPIOA
-#define SD_SCK_Pin GPIO_PIN_3
-#define SD_SCK_GPIO_Port GPIOB
 #define SD_MISO_Pin GPIO_PIN_4
 #define SD_MISO_GPIO_Port GPIOB
 #define SD_MOSI_Pin GPIO_PIN_5

@@ -79,7 +79,7 @@ void StartDefaultTask(void *argument);
 void start_task_gsm(void *argument);
 void start_task_send_gsm(void *argument);
 
-extern void MX_USB_DEVICE_Init(void);
+//extern void MX_USB_DEVICE_Init(void);
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
 /**
@@ -110,7 +110,7 @@ void MX_FREERTOS_Init(void) {
 
   /* Create the thread(s) */
   /* creation of defaultTask */
-//  defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
+  defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
 
   /* creation of task_gsm */
   task_gsmHandle = osThreadNew(start_task_gsm, NULL, &task_gsm_attributes);
@@ -135,18 +135,18 @@ void MX_FREERTOS_Init(void) {
 * @retval None
 */
 /* USER CODE END Header_StartDefaultTask */
-//void StartDefaultTask(void *argument)
-//{
-//  /* init code for USB_DEVICE */
+void StartDefaultTask(void *argument)
+{
+  /* init code for USB_DEVICE */
 //  MX_USB_DEVICE_Init();
-//  /* USER CODE BEGIN StartDefaultTask */
-////  /* Infinite loop */
-////  for(;;)
-////  {
-////    osDelay(1);
-////  }
-//  /* USER CODE END StartDefaultTask */
-//}
+  /* USER CODE BEGIN StartDefaultTask */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END StartDefaultTask */
+}
 
 /* USER CODE BEGIN Header_start_task_gsm */
 /**

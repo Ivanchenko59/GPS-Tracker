@@ -38,6 +38,9 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+#ifdef DEBUG
+#define SWO_DEBUG
+#endif
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -60,6 +63,19 @@ void MX_FREERTOS_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+
+#ifdef SWO_DEBUG
+int _write(int file, uint8_t *ptr, int len)
+{
+
+	for (int DataIdx = 0; DataIdx < len; DataIdx++)
+	{
+		ITM_SendChar(*ptr++);
+	}
+	return len;
+}
+#endif
+#ifdef UART_DEBUG
 #ifdef __GNUC__
 #define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
 #else
@@ -72,6 +88,8 @@ PUTCHAR_PROTOTYPE
 	LL_USART_TransmitData8(USART1, *(uint8_t*)&ch);
 	return ch;
 }
+#endif
+
 /* USER CODE END 0 */
 
 /**
@@ -105,7 +123,6 @@ int main(void)
   MX_USART1_UART_Init();
   MX_USART2_UART_Init();
   MX_SPI1_Init();
-  MX_SPI3_Init();
   MX_FATFS_Init();
   /* USER CODE BEGIN 2 */
   MX_USB_DEVICE_Init();

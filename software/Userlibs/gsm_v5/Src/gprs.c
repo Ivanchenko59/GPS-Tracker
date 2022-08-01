@@ -227,7 +227,7 @@ int16_t gsm_gprs_httpGet(const char *url, bool ssl, uint16_t timeout_ms)
     }
     if (gsm_command("AT+HTTPACTION=0\r\n", timeout_ms , (char*)gsm.buffer, sizeof(gsm.buffer), 2, "\r\n+HTTPACTION:", "\r\nERROR\r\n") != 1)
       break;
-    sscanf((char*)gsm.buffer, "\r\n+HTTPACTION: 0,%hd,%d\r\n", &gsm.gprs.code, &gsm.gprs.dataLen);
+    sscanf((char*)gsm.buffer, "\r\n+HTTPACTION: 0,%hd,%ld\r\n", &gsm.gprs.code, &gsm.gprs.dataLen);
   } while (0);
   gsm_printf("[GSM] gprs_httpGet(%s) done. answer: %d\r\n", url, gsm.gprs.code);
   gsm_unlock();
@@ -269,7 +269,7 @@ int16_t gsm_gprs_httpPost(const char *url, bool ssl, uint16_t timeout_ms)
     }
     if (gsm_command("AT+HTTPACTION=1\r\n", timeout_ms , (char*)gsm.buffer, sizeof(gsm.buffer), 2, "\r\n+HTTPACTION:", "\r\nERROR\r\n") != 1)
       break;
-    sscanf((char*)gsm.buffer, "\r\n+HTTPACTION: 1,%hd,%d\r\n", &gsm.gprs.code, &gsm.gprs.dataLen);
+    sscanf((char*)gsm.buffer, "\r\n+HTTPACTION: 1,%hd,%ld\r\n", &gsm.gprs.code, &gsm.gprs.dataLen);
   } while (0);
   gsm_printf("[GSM] gprs_httpPost(%s) done. answer: %d\r\n", url, gsm.gprs.code);
   gsm_unlock();
@@ -297,7 +297,7 @@ uint16_t gsm_gprs_httpRead(uint8_t *data, uint16_t len)
   if (len >= sizeof(gsm.buffer) - 32)
     len = sizeof(gsm.buffer) - 32;
   char buf[32];
-  sprintf(buf, "AT+HTTPREAD=%d,%d\r\n", gsm.gprs.dataCurrent, len);
+  sprintf(buf, "AT+HTTPREAD=%ld,%d\r\n", gsm.gprs.dataCurrent, len);
   if (gsm_command(buf, 1000 , (char*)gsm.buffer, sizeof(gsm.buffer), 2, "\r\n+HTTPREAD: ", "\r\nERROR\r\n") != 1)
   {
     gsm_printf("[GSM] gprs_httpRead() failed!\r\n");
@@ -583,7 +583,7 @@ gsm_ftp_error_t gsm_gprs_ftpExtUpload(uint8_t *data, uint16_t len)
   char answer[64];
   do
   {
-    sprintf((char*)gsm.buffer, "AT+FTPEXTPUT=2,%d,%d,5000\r\n", gsm.gprs.ftpExtOffset, len);
+    sprintf((char*)gsm.buffer, "AT+FTPEXTPUT=2,%ld,%d,5000\r\n", gsm.gprs.ftpExtOffset, len);
     if (gsm_command((char*)gsm.buffer, 5000, answer, sizeof(answer), 2, "\r\n+FTPEXTPUT: ", "\r\nERROR\r\n") != 1)
       break;
     char *s = strchr(answer, ',');
@@ -732,7 +732,7 @@ uint32_t gsm_gprs_ftpGetSize(const char *path, const char *name)
       error = atoi(s);
     }
   } while (0);
-  gsm_printf("[GSM] gprs_ftpGetSize(%s, %s) done. answer: %d\r\n", path, name, error);
+  gsm_printf("[GSM] gprs_ftpGetSize(%s, %s) done. answer: %ld\r\n", path, name, error);
   gsm_unlock();
   return error;
 }
