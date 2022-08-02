@@ -1,7 +1,7 @@
 #MicroXplorer Configuration settings - do not modify
 FREERTOS.FootprintOK=true
 FREERTOS.IPParameters=Tasks01,configUSE_NEWLIB_REENTRANT,FootprintOK
-FREERTOS.Tasks01=defaultTask,24,128,StartDefaultTask,Default,NULL,Dynamic,NULL,NULL;task_gsm,24,512,start_task_gsm,Default,NULL,Dynamic,NULL,NULL;task_send_gsm,24,512,start_task_send_gsm,Default,NULL,Dynamic,NULL,NULL
+FREERTOS.Tasks01=defaultTask,24,128,StartDefaultTask,Default,NULL,Dynamic,NULL,NULL;task_gsm,24,512,start_task_gsm,Default,NULL,Dynamic,NULL,NULL;task_send_gsm,24,512,start_task_send_gsm,Default,NULL,Dynamic,NULL,NULL;task_nmea,24,1024,start_task_nmea,Default,NULL,Dynamic,NULL,NULL;task_gps,8,128,start_task_gps,Default,NULL,Dynamic,NULL,NULL
 FREERTOS.configUSE_NEWLIB_REENTRANT=1
 File.Version=6
 GPIO.groupedBy=Group By Peripherals
@@ -67,6 +67,7 @@ NVIC.SysTick_IRQn=true\:15\:0\:false\:false\:false\:true\:false\:true
 NVIC.TIM1_TRG_COM_TIM11_IRQn=true\:15\:0\:false\:false\:true\:false\:false\:true
 NVIC.TimeBase=TIM1_TRG_COM_TIM11_IRQn
 NVIC.TimeBaseIP=TIM11
+NVIC.USART1_IRQn=true\:5\:0\:false\:false\:true\:true\:true\:true
 NVIC.USART2_IRQn=true\:5\:0\:false\:false\:true\:true\:true\:true
 NVIC.UsageFault_IRQn=true\:0\:0\:false\:false\:true\:false\:false\:false
 PA10.Locked=true
@@ -240,7 +241,8 @@ SPI1.Direction=SPI_DIRECTION_2LINES
 SPI1.IPParameters=VirtualType,Mode,Direction,CalculateBaudRate
 SPI1.Mode=SPI_MODE_MASTER
 SPI1.VirtualType=VM_MASTER
-USART1.IPParameters=VirtualMode
+USART1.BaudRate=9600
+USART1.IPParameters=VirtualMode,BaudRate
 USART1.VirtualMode=VM_ASYNC
 USART2.IPParameters=VirtualMode
 USART2.VirtualMode=VM_ASYNC

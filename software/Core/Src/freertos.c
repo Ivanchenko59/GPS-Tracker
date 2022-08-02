@@ -27,11 +27,12 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "gsm.h"
+#include "nmea.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-
+nmea_t gps;
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -69,6 +70,20 @@ const osThreadAttr_t task_send_gsm_attributes = {
   .stack_size = 512 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
+/* Definitions for task_nmea */
+osThreadId_t task_nmeaHandle;
+const osThreadAttr_t task_nmea_attributes = {
+  .name = "task_nmea",
+  .stack_size = 1024 * 4,
+  .priority = (osPriority_t) osPriorityNormal,
+};
+/* Definitions for task_gps */
+osThreadId_t task_gpsHandle;
+const osThreadAttr_t task_gps_attributes = {
+  .name = "task_gps",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityLow,
+};
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -78,8 +93,10 @@ const osThreadAttr_t task_send_gsm_attributes = {
 void StartDefaultTask(void *argument);
 void start_task_gsm(void *argument);
 void start_task_send_gsm(void *argument);
+void start_task_nmea(void *argument);
+void start_task_gps(void *argument);
 
-//extern void MX_USB_DEVICE_Init(void);
+extern void MX_USB_DEVICE_Init(void);
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
 /**
@@ -117,6 +134,12 @@ void MX_FREERTOS_Init(void) {
 
   /* creation of task_send_gsm */
   task_send_gsmHandle = osThreadNew(start_task_send_gsm, NULL, &task_send_gsm_attributes);
+
+  /* creation of task_nmea */
+  task_nmeaHandle = osThreadNew(start_task_nmea, NULL, &task_nmea_attributes);
+
+  /* creation of task_gps */
+  task_gpsHandle = osThreadNew(start_task_gps, NULL, &task_gps_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -164,7 +187,7 @@ void start_task_gsm(void *argument)
   for(;;)
   {
 	  gsm_loop();
-	  osDelay(1);
+	  osDelay(10);
   }
   /* USER CODE END start_task_gsm */
 }
@@ -180,13 +203,56 @@ void start_task_send_gsm(void *argument)
 {
   /* USER CODE BEGIN start_task_send_gsm */
 	gsm_waitForRegister(30);
-	gsm_msg_send("+380666874820", "TEST MSG 1");
+//	gsm_msg_send("+380666874820", "TEST MSG 1");
   /* Infinite loop */
   for(;;)
   {
-    osDelay(10000);
+    osDelay(20000);
   }
   /* USER CODE END start_task_send_gsm */
+}
+
+/* USER CODE BEGIN Header_start_task_nmea */
+/**
+* @brief Function implementing the task_nmea thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_start_task_nmea */
+void start_task_nmea(void *argument)
+{
+  /* USER CODE BEGIN start_task_nmea */
+	nmea_init(&gps, USART1, 1024);
+  /* Infinite loop */
+  for(;;)
+  {
+	nmea_loop(&gps);
+	osDelay(1);
+  }
+  /* USER CODE END start_task_nmea */
+}
+
+/* USER CODE BEGIN Header_start_task_gps */
+/**
+* @brief Function implementing the task_gps thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_start_task_gps */
+void start_task_gps(void *argument)
+{
+  /* USER CODE BEGIN start_task_gps */
+	uint8_t time_h;
+  /* Infinite loop */
+  for(;;)
+  {
+	if (nmea_available(&gps)) {
+		nmea_gnss_time_h(&gps, &time_h);
+		nmea_available_reset(&gps);
+	}
+	osDelay(5000);
+  }
+  /* USER CODE END start_task_gps */
 }
 
 /* Private application code --------------------------------------------------*/
