@@ -61,6 +61,7 @@
 									<listOptionValue builtIn="false" value="../Userlibs/atc/Inc"/>
 									<listOptionValue builtIn="false" value="../Userlibs/gsm_v5/Inc"/>
 									<listOptionValue builtIn="false" value="../Userlibs/NMEA/Inc"/>
+									<listOptionValue builtIn="false" value="../Userlibs/w25qxx/Inc"/>
 								</option>
 								<inputType id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c.612302495" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c"/>
 							</tool>
