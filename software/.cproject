@@ -58,10 +58,10 @@
 									<listOptionValue builtIn="false" value="../Middlewares/Third_Party/FatFs/src"/>
 									<listOptionValue builtIn="false" value="../Middlewares/ST/STM32_USB_Device_Library/Core/Inc"/>
 									<listOptionValue builtIn="false" value="../Middlewares/ST/STM32_USB_Device_Library/Class/MSC/Inc"/>
-									<listOptionValue builtIn="false" value="../Userlibs/atc/Inc"/>
+									<listOptionValue builtIn="false" value="../Userlibs/w25qxx"/>
+									<listOptionValue builtIn="false" value="../Userlibs/atc/"/>
 									<listOptionValue builtIn="false" value="../Userlibs/gsm_v5/Inc"/>
-									<listOptionValue builtIn="false" value="../Userlibs/NMEA/Inc"/>
-									<listOptionValue builtIn="false" value="../Userlibs/w25qxx/Inc"/>
+									<listOptionValue builtIn="false" value="../Userlibs/NMEA"/>
 								</option>
 								<inputType id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c.612302495" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c"/>
 							</tool>

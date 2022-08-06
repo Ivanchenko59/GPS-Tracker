@@ -70,6 +70,10 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define GSM_UART_TX_Pin GPIO_PIN_2
+#define GSM_UART_TX_GPIO_Port GPIOA
+#define GSM_USART_RX_Pin GPIO_PIN_3
+#define GSM_USART_RX_GPIO_Port GPIOA
 #define W25_CS_Pin GPIO_PIN_4
 #define W25_CS_GPIO_Port GPIOA
 #define W25_SCK_Pin GPIO_PIN_5
@@ -78,14 +82,20 @@ void Error_Handler(void);
 #define W25_MISO_GPIO_Port GPIOA
 #define W25_MOSI_Pin GPIO_PIN_7
 #define W25_MOSI_GPIO_Port GPIOA
-#define SD_MISO_Pin GPIO_PIN_4
+#define SD_DETECT_Pin GPIO_PIN_12
+#define SD_DETECT_GPIO_Port GPIOB
+#define SD_SCK_Pin GPIO_PIN_13
+#define SD_SCK_GPIO_Port GPIOB
+#define SD_MISO_Pin GPIO_PIN_14
 #define SD_MISO_GPIO_Port GPIOB
-#define SD_MOSI_Pin GPIO_PIN_5
+#define SD_MOSI_Pin GPIO_PIN_15
 #define SD_MOSI_GPIO_Port GPIOB
-#define SD_CS_Pin GPIO_PIN_6
-#define SD_CS_GPIO_Port GPIOB
-#define SC_DETECT_Pin GPIO_PIN_7
-#define SC_DETECT_GPIO_Port GPIOB
+#define SD_CS_Pin GPIO_PIN_8
+#define SD_CS_GPIO_Port GPIOA
+#define GPS_USART_TX_Pin GPIO_PIN_6
+#define GPS_USART_TX_GPIO_Port GPIOB
+#define GPS_USART_RX_Pin GPIO_PIN_7
+#define GPS_USART_RX_GPIO_Port GPIOB
 #define PWRKEY_GSM_Pin GPIO_PIN_9
 #define PWRKEY_GSM_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
