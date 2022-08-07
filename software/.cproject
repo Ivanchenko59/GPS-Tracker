@@ -61,6 +61,7 @@
 									<listOptionValue builtIn="false" value="../Userlibs/atc/"/>
 									<listOptionValue builtIn="false" value="../Userlibs/gsm_v5/Inc"/>
 									<listOptionValue builtIn="false" value="../Userlibs/NMEA"/>
+									<listOptionValue builtIn="false" value="../Userlibs/sdcard_spi_fatfs"/>
 								</option>
 								<inputType id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c.612302495" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c"/>
 							</tool>

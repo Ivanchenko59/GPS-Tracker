@@ -3,14 +3,15 @@
 #define bool BYTE
 
 #include "stm32f4xx_hal.h"
+#include "main.h"
 #include "diskio.h"
 #include "fatfs_sd.h"
 
 
-extern SPI_HandleTypeDef 	hspi1;
-#define HSPI_SDCARD		 	&hspi1
-#define	SD_CS_PORT			GPIOB
-#define SD_CS_PIN			GPIO_PIN_0
+extern SPI_HandleTypeDef 	hspi2;
+#define HSPI_SDCARD		 	&hspi2
+#define	SD_CS_PORT			SD_CS_GPIO_Port
+#define SD_CS_PIN			SD_CS_Pin
 
 extern volatile uint16_t Timer1, Timer2;					/* 1ms Timer Counter */
 
