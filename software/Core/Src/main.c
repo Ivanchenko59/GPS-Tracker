@@ -126,7 +126,6 @@ int main(void)
   MX_SPI2_Init();
   /* USER CODE BEGIN 2 */
   MX_USB_DEVICE_Init();
-  W25qxx_Init();
 
   /* USER CODE END 2 */
 

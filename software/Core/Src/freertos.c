@@ -74,7 +74,7 @@ const osThreadAttr_t task_send_gsm_attributes = {
 osThreadId_t task_nmeaHandle;
 const osThreadAttr_t task_nmea_attributes = {
   .name = "task_nmea",
-  .stack_size = 1024 * 4,
+  .stack_size = 512 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
 /* Definitions for task_gps */
