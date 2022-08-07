@@ -23,7 +23,8 @@
 #include "usbd_storage_if.h"
 
 /* USER CODE BEGIN INCLUDE */
-
+#include "ff.h"
+#include "diskio.h"
 /* USER CODE END INCLUDE */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -32,7 +33,7 @@
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
-
+uint32_t _block_num, _block_size;
 /* USER CODE END PV */
 
 /** @addtogroup STM32_USB_OTG_DEVICE_LIBRARY
@@ -68,6 +69,7 @@
 #define STORAGE_BLK_SIZ                  0x200
 
 /* USER CODE BEGIN PRIVATE_DEFINES */
+
 /* USER CODE END PRIVATE_DEFINES */
 
 /**
@@ -177,6 +179,7 @@ USBD_StorageTypeDef USBD_Storage_Interface_fops_FS =
 int8_t STORAGE_Init_FS(uint8_t lun)
 {
   /* USER CODE BEGIN 2 */
+	disk_initialize(0);
   return (USBD_OK);
   /* USER CODE END 2 */
 }
@@ -191,8 +194,12 @@ int8_t STORAGE_Init_FS(uint8_t lun)
 int8_t STORAGE_GetCapacity_FS(uint8_t lun, uint32_t *block_num, uint16_t *block_size)
 {
   /* USER CODE BEGIN 3 */
-  *block_num  = STORAGE_BLK_NBR;
-  *block_size = STORAGE_BLK_SIZ;
+//  *block_num  = STORAGE_BLK_NBR;
+//  *block_size = STORAGE_BLK_SIZ;
+	disk_ioctl(0, GET_SECTOR_COUNT, &_block_num);
+	disk_ioctl(0, GET_SECTOR_SIZE/*GET_BLOCK_SIZE*/, &_block_size);
+  *block_num = _block_num - 1;
+  *block_size = 512;
   return (USBD_OK);
   /* USER CODE END 3 */
 }
@@ -229,6 +236,7 @@ int8_t STORAGE_IsWriteProtected_FS(uint8_t lun)
 int8_t STORAGE_Read_FS(uint8_t lun, uint8_t *buf, uint32_t blk_addr, uint16_t blk_len)
 {
   /* USER CODE BEGIN 6 */
+	disk_read(0, buf, blk_addr, blk_len);
   return (USBD_OK);
   /* USER CODE END 6 */
 }
@@ -241,6 +249,7 @@ int8_t STORAGE_Read_FS(uint8_t lun, uint8_t *buf, uint32_t blk_addr, uint16_t bl
 int8_t STORAGE_Write_FS(uint8_t lun, uint8_t *buf, uint32_t blk_addr, uint16_t blk_len)
 {
   /* USER CODE BEGIN 7 */
+	disk_write(0, buf, blk_addr, blk_len);
   return (USBD_OK);
   /* USER CODE END 7 */
 }

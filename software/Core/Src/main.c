@@ -122,11 +122,14 @@ int main(void)
   MX_USART1_UART_Init();
   MX_USART2_UART_Init();
   MX_SPI1_Init();
-  MX_FATFS_Init();
   MX_SPI2_Init();
+  MX_FATFS_Init();
   /* USER CODE BEGIN 2 */
-//  MX_USB_DEVICE_Init();
 
+  if (HAL_GPIO_ReadPin(BTN_GPIO_Port, BTN_Pin) == GPIO_PIN_RESET) {
+	  MX_USB_DEVICE_Init();
+	   while(1) {}
+  }
   /* USER CODE END 2 */
 
   /* Init scheduler */

@@ -178,7 +178,6 @@ void MX_FREERTOS_Init(void) {
 void StartDefaultTask(void *argument)
 {
   /* init code for USB_DEVICE */
-  MX_USB_DEVICE_Init();
   /* USER CODE BEGIN StartDefaultTask */
   /* Infinite loop */
   for(;;)
@@ -259,7 +258,7 @@ void start_task_nmea(void *argument)
 void start_task_gps(void *argument)
 {
   /* USER CODE BEGIN start_task_gps */
-	uint8_t time_h;
+//	uint8_t time_h;
   /* Infinite loop */
   for(;;)
   {
