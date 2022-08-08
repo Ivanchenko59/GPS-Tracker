@@ -126,6 +126,8 @@ int main(void)
   MX_SPI2_Init();
   /* USER CODE BEGIN 2 */
 
+  HAL_Delay(100);
+
   if (HAL_GPIO_ReadPin(BTN_GPIO_Port, BTN_Pin) == GPIO_PIN_RESET) {
 	  MX_USB_DEVICE_Init();
 	   while(1) {}
