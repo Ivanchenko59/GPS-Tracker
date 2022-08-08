@@ -48,11 +48,15 @@ nmea_t gps;
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN Variables */
-FATFS fs;  // file system
-FIL fil; // File
-	FILINFO fno;
+FATFS 	fs;  // file system
+FIL 	fil; // File
+FILINFO fno;
 FRESULT fresult;  // result
-	UINT br, bw;  // File read/write count
+UINT 	br, bw;  // File read/write count
+
+typedef struct {
+	gnss_t data;
+}QUEUE_t;
 
 /* USER CODE END Variables */
 /* Definitions for defaultTask */
@@ -97,6 +101,11 @@ const osThreadAttr_t task_sdcard_attributes = {
   .stack_size = 512 * 4,
   .priority = (osPriority_t) osPriorityAboveNormal,
 };
+/* Definitions for gnss_queue */
+osMessageQueueId_t gnss_queueHandle;
+const osMessageQueueAttr_t gnss_queue_attributes = {
+  .name = "gnss_queue"
+};
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -134,6 +143,10 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN RTOS_TIMERS */
   /* start timers, add new ones, ... */
   /* USER CODE END RTOS_TIMERS */
+
+  /* Create the queue(s) */
+  /* creation of gnss_queue */
+  gnss_queueHandle = osMessageQueueNew (2, sizeof(QUEUE_t), &gnss_queue_attributes);
 
   /* USER CODE BEGIN RTOS_QUEUES */
   /* add queues, ... */
@@ -178,6 +191,7 @@ void MX_FREERTOS_Init(void) {
 void StartDefaultTask(void *argument)
 {
   /* init code for USB_DEVICE */
+  MX_USB_DEVICE_Init();
   /* USER CODE BEGIN StartDefaultTask */
   /* Infinite loop */
   for(;;)
@@ -258,15 +272,22 @@ void start_task_nmea(void *argument)
 void start_task_gps(void *argument)
 {
   /* USER CODE BEGIN start_task_gps */
-//	uint8_t time_h;
+	QUEUE_t gnss_data;
+	float delta = 0;
   /* Infinite loop */
   for(;;)
   {
-//	if (nmea_available(&gps)) {
-//		nmea_gnss_time_h(&gps, &time_h);
-//		nmea_available_reset(&gps);
-//	}
-	osDelay(5000);
+//	if (nmea_available(&gps))
+
+	  gnss_data.data.latitude_deg = 55.3223 + delta;
+	  gnss_data.data.longitude_deg = 29.2932 + delta;
+
+
+	  osMessageQueuePut(gnss_queueHandle, &gnss_data, 0, osWaitForever);
+
+	  delta++;
+
+	  osDelay(1000);
   }
   /* USER CODE END start_task_gps */
 }
@@ -281,38 +302,42 @@ void start_task_gps(void *argument)
 void start_task_sdcard(void *argument)
 {
   /* USER CODE BEGIN start_task_sdcard */
-
-
-	uint32_t index = 1;
+	QUEUE_t gnss_data = {};
+	int index = 1;
 	char buffer[64];
   /* Infinite loop */
   for(;;)
   {
-	  fresult = f_mount(&fs, "", 0);
-	  if (fresult != FR_OK) {
-		  printf("Mount failed\n");
+	  if (osMessageQueueGetCount(gnss_queueHandle)) {
+
+		  osMessageQueueGet(gnss_queueHandle, &gnss_data, 0, osWaitForever);
+
+		  fresult = f_mount(&fs, "", 0);
+		  if (fresult != FR_OK) {
+			  printf("Mount failed\n");
+		  }
+
+		  fresult = f_open(&fil, "data.txt", FA_OPEN_ALWAYS | FA_WRITE);
+		  if (fresult != FR_OK) {
+			  printf("File wasn't create\n");
+		  }
+		  memset(buffer, '\0', sizeof(buffer));
+
+		  sprintf(buffer, "%d.\t%f\t%f\n", index, gnss_data.data.latitude_deg, gnss_data.data.longitude_deg);
+		  f_lseek(&fil, f_size(&fil));
+		  f_puts(buffer, &fil);
+
+		  fresult = f_close(&fil);
+		  if (fresult != FR_OK) {
+			  printf("File wasn't close\n");
+		  }
+
+		  fresult = f_mount(NULL, "", 1);
+
+		  index++;
 	  }
 
-	  fresult = f_open(&fil, "data.txt", FA_OPEN_ALWAYS | FA_WRITE);
-	  if (fresult != FR_OK) {
-		  printf("File wasn't create\n");
-	  }
-
-	  memset(buffer, '\0', sizeof(buffer));
-	  sprintf(buffer, "%ld. %ld\n", index, index * index);
-	  f_lseek(&fil, f_size(&fil));
-	  f_puts(buffer, &fil);
-
-	  fresult = f_close(&fil);
-	  if (fresult != FR_OK) {
-		  printf("File wasn't close\n");
-	  }
-
-	  fresult = f_mount(NULL, "", 1);
-
-	  index++;
-
-	  osDelay(500);
+	  osDelay(1000);
   }
   /* USER CODE END start_task_sdcard */
 }
@@ -321,7 +346,7 @@ void start_task_sdcard(void *argument)
 /* USER CODE BEGIN Application */
 int bufsize(char *buf)
 {
-	int i=0;
+	int i = 0;
 	while (*buf++ != '\0') i++;
 	return i;
 }
