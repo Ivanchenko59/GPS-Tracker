@@ -275,9 +275,9 @@ void start_task_get_gps(void *argument)
   /* Infinite loop */
 	for(;;)
 	{
-	if (nmea_available(&gps)) {
-		osMessageQueuePut(gnss_queueHandle, &gps, 0, osWaitForever);
-	}
+		if (nmea_available(&gps)) {
+			osMessageQueuePut(gnss_queueHandle, &gps, 0, osWaitForever);
+		}
 		osDelay(1000);
 	}
   /* USER CODE END start_task_get_gps */
