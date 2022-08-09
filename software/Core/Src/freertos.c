@@ -71,14 +71,14 @@ osThreadId_t task_gsmHandle;
 const osThreadAttr_t task_gsm_attributes = {
   .name = "task_gsm",
   .stack_size = 512 * 4,
-  .priority = (osPriority_t) osPriorityNormal1,
+  .priority = (osPriority_t) osPriorityNormal2,
 };
 /* Definitions for task_send_gsm */
 osThreadId_t task_send_gsmHandle;
 const osThreadAttr_t task_send_gsm_attributes = {
   .name = "task_send_gsm",
-  .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityNormal2,
+  .stack_size = 254 * 4,
+  .priority = (osPriority_t) osPriorityNormal1,
 };
 /* Definitions for task_nmea */
 osThreadId_t task_nmeaHandle;
@@ -191,7 +191,7 @@ void MX_FREERTOS_Init(void) {
 void StartDefaultTask(void *argument)
 {
   /* init code for USB_DEVICE */
-//  MX_USB_DEVICE_Init();
+  MX_USB_DEVICE_Init();
   /* USER CODE BEGIN StartDefaultTask */
   /* Infinite loop */
   for(;;)
@@ -211,14 +211,15 @@ void StartDefaultTask(void *argument)
 void start_task_gsm(void *argument)
 {
   /* USER CODE BEGIN start_task_gsm */
-//	gsm_init();
-//	gsm_power(true);
+	gsm_init();
+	gsm_power(true);
+
   /* Infinite loop */
-  for(;;)
-  {
-//	  gsm_loop();
-	  osDelay(100);
-  }
+	for(;;)
+	{
+		gsm_loop();
+		osDelay(100);
+	}
   /* USER CODE END start_task_gsm */
 }
 
@@ -232,13 +233,14 @@ void start_task_gsm(void *argument)
 void start_task_send_gsm(void *argument)
 {
   /* USER CODE BEGIN start_task_send_gsm */
-//	gsm_waitForRegister(30);
+	gsm_waitForRegister(30);
+	gsm_msg_textMode(1, 1);
 //	gsm_msg_send("+380666874820", "TEST MSG 1");
   /* Infinite loop */
-  for(;;)
-  {
-    osDelay(2000);
-  }
+	for(;;)
+	{
+		osDelay(2000);
+	}
   /* USER CODE END start_task_send_gsm */
 }
 
@@ -277,8 +279,9 @@ void start_task_get_gps(void *argument)
 	{
 		if (nmea_available(&gps)) {
 			osMessageQueuePut(gnss_queueHandle, &gps, 0, osWaitForever);
+			nmea_available_reset(&gps);
 		}
-		osDelay(1000);
+		osDelay(2000);
 	}
   /* USER CODE END start_task_get_gps */
 }

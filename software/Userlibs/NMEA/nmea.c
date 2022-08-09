@@ -47,22 +47,23 @@ inline float nmea_convert(float raw_degrees)
 inline void nmea_callback(nmea_t *nmea)
 {
 	if (LL_USART_IsActiveFlag_RXNE(nmea->usart))
-  {
-    uint8_t tmp = LL_USART_ReceiveData8(nmea->usart);
+	{
+		uint8_t tmp = LL_USART_ReceiveData8(nmea->usart);
 		if (nmea->available)
 			return;
-    if (nmea->buf_index < nmea->buf_size - 1)
-    {
-      nmea->buf[nmea->buf_index++] = tmp;
-      nmea->buf_time = HAL_GetTick();
-    }
-  }
-  else
-//    nmea->usart->ICR = 0xFFFFFFFF;
-	LL_USART_ClearFlag_IDLE(USART1);
-//	LL_USART_ClearFlag_LBD(USART1);
-	LL_USART_ClearFlag_RXNE(USART1);
-	LL_USART_ClearFlag_TC(USART1);
+		if (nmea->buf_index < nmea->buf_size - 1)
+		{
+			nmea->buf[nmea->buf_index++] = tmp;
+			nmea->buf_time = HAL_GetTick();
+		}
+	}
+	else {
+//		nmea->usart->ICR = 0xFFFFFFFF;
+		LL_USART_ClearFlag_IDLE(USART1);
+		LL_USART_ClearFlag_LBD(USART1);
+		LL_USART_ClearFlag_RXNE(USART1);
+		LL_USART_ClearFlag_TC(USART1);
+	}
 }
 //###########################################################################################################################
 bool nmea_init(nmea_t *nmea, USART_TypeDef *usart, uint16_t buf_size)
