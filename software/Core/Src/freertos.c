@@ -54,10 +54,6 @@ FILINFO fno;
 FRESULT fresult;  // result
 UINT 	br, bw;  // File read/write count
 
-//typedef struct {
-//	gnss_t data;
-//}QUEUE_t;
-
 /* USER CODE END Variables */
 /* Definitions for defaultTask */
 osThreadId_t defaultTaskHandle;
@@ -71,7 +67,7 @@ osThreadId_t task_gsmHandle;
 const osThreadAttr_t task_gsm_attributes = {
   .name = "task_gsm",
   .stack_size = 512 * 4,
-  .priority = (osPriority_t) osPriorityNormal2,
+  .priority = (osPriority_t) osPriorityAboveNormal1,
 };
 /* Definitions for task_send_gsm */
 osThreadId_t task_send_gsmHandle;
@@ -106,6 +102,16 @@ osMessageQueueId_t gnss_queueHandle;
 const osMessageQueueAttr_t gnss_queue_attributes = {
   .name = "gnss_queue"
 };
+/* Definitions for sender_num_queue */
+osMessageQueueId_t sender_num_queueHandle;
+const osMessageQueueAttr_t sender_num_queue_attributes = {
+  .name = "sender_num_queue"
+};
+/* Definitions for send_sms_sem */
+osSemaphoreId_t send_sms_semHandle;
+const osSemaphoreAttr_t send_sms_sem_attributes = {
+  .name = "send_sms_sem"
+};
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -136,8 +142,13 @@ void MX_FREERTOS_Init(void) {
   /* add mutexes, ... */
   /* USER CODE END RTOS_MUTEX */
 
+  /* Create the semaphores(s) */
+  /* creation of send_sms_sem */
+  send_sms_semHandle = osSemaphoreNew(1, 1, &send_sms_sem_attributes);
+
   /* USER CODE BEGIN RTOS_SEMAPHORES */
   /* add semaphores, ... */
+  osSemaphoreAcquire(send_sms_semHandle, osWaitForever);
   /* USER CODE END RTOS_SEMAPHORES */
 
   /* USER CODE BEGIN RTOS_TIMERS */
@@ -147,6 +158,9 @@ void MX_FREERTOS_Init(void) {
   /* Create the queue(s) */
   /* creation of gnss_queue */
   gnss_queueHandle = osMessageQueueNew (2, sizeof(nmea_t), &gnss_queue_attributes);
+
+  /* creation of sender_num_queue */
+  sender_num_queueHandle = osMessageQueueNew (1, sizeof(char*), &sender_num_queue_attributes);
 
   /* USER CODE BEGIN RTOS_QUEUES */
   /* add queues, ... */
@@ -191,7 +205,7 @@ void MX_FREERTOS_Init(void) {
 void StartDefaultTask(void *argument)
 {
   /* init code for USB_DEVICE */
-  MX_USB_DEVICE_Init();
+//  MX_USB_DEVICE_Init();
   /* USER CODE BEGIN StartDefaultTask */
   /* Infinite loop */
   for(;;)
@@ -233,13 +247,19 @@ void start_task_gsm(void *argument)
 void start_task_send_gsm(void *argument)
 {
   /* USER CODE BEGIN start_task_send_gsm */
+	char user_number[16] = {'\0'};
+	char sms_to_send[64] = "https://www.google.com/maps/@";
 	gsm_waitForRegister(30);
-	gsm_msg_textMode(1, 1);
-//	gsm_msg_send("+380666874820", "TEST MSG 1");
+	gsm_msg_textMode(0, 0);
+
   /* Infinite loop */
 	for(;;)
 	{
-		osDelay(2000);
+		osSemaphoreAcquire(send_sms_semHandle, osWaitForever);
+		osMessageQueueGet(sender_num_queueHandle, user_number, 0, osWaitForever);
+//		memset after /@ to end
+		sprintf(sms_to_send, "%.7f,%.7f", gps.gnss.latitude_deg, gps.gnss.longitude_deg);
+//		gsm_msg_send(user_number, sms_to_send);
 	}
   /* USER CODE END start_task_send_gsm */
 }
@@ -258,7 +278,7 @@ void start_task_nmea(void *argument)
   /* Infinite loop */
 	for(;;)
 	{
-		nmea_loop(&gps);
+//		nmea_loop(&gps);
 		osDelay(100);
 	}
   /* USER CODE END start_task_nmea */
@@ -277,10 +297,10 @@ void start_task_get_gps(void *argument)
   /* Infinite loop */
 	for(;;)
 	{
-		if (nmea_available(&gps)) {
-			osMessageQueuePut(gnss_queueHandle, &gps, 0, osWaitForever);
-			nmea_available_reset(&gps);
-		}
+//		if (nmea_available(&gps)) {
+//			osMessageQueuePut(gnss_queueHandle, &gps, 0, osWaitForever);
+//			nmea_available_reset(&gps);
+//		}
 		osDelay(2000);
 	}
   /* USER CODE END start_task_get_gps */
@@ -302,33 +322,33 @@ void start_task_sdcard(void *argument)
   /* Infinite loop */
 	for(;;)
 	{
-		if (osMessageQueueGetCount(gnss_queueHandle)) {
-
-			osMessageQueueGet(gnss_queueHandle, &gnss_data, 0, osWaitForever);
-
-			fresult = f_mount(&fs, "", 0);
-			if (fresult != FR_OK) {
-				printf("Mount failed\n");
-			}
-
-			fresult = f_open(&fil, "data.txt", FA_OPEN_ALWAYS | FA_WRITE);
-			if (fresult != FR_OK) {
-				printf("File wasn't create\n");
-			}
-			memset(buffer, '\0', sizeof(buffer));
-
-			sprintf(buffer, "%d.\t%.7f\t%.7f\n", index, gnss_data.gnss.latitude_deg, gnss_data.gnss.longitude_deg);
-			f_lseek(&fil, f_size(&fil));
-			f_puts(buffer, &fil);
-			fresult = f_close(&fil);
-			if (fresult != FR_OK) {
-				printf("File wasn't close\n");
-			}
-
-			fresult = f_mount(NULL, "", 1);
-
-			index++;
-		}
+//		if (osMessageQueueGetCount(gnss_queueHandle)) {
+//
+//			osMessageQueueGet(gnss_queueHandle, &gnss_data, 0, osWaitForever);
+//
+//			fresult = f_mount(&fs, "", 0);
+//			if (fresult != FR_OK) {
+//				printf("Mount failed\n");
+//			}
+//
+//			fresult = f_open(&fil, "data.txt", FA_OPEN_ALWAYS | FA_WRITE);
+//			if (fresult != FR_OK) {
+//				printf("File wasn't create\n");
+//			}
+//			memset(buffer, '\0', sizeof(buffer));
+//
+//			sprintf(buffer, "%d.\t%.7f\t%.7f\n", index, gnss_data.gnss.latitude_deg, gnss_data.gnss.longitude_deg);
+//			f_lseek(&fil, f_size(&fil));
+//			f_puts(buffer, &fil);
+//			fresult = f_close(&fil);
+//			if (fresult != FR_OK) {
+//				printf("File wasn't close\n");
+//			}
+//
+//			fresult = f_mount(NULL, "", 1);
+//
+//			index++;
+//		}
 
 		osDelay(1000);
 	}

@@ -196,10 +196,15 @@ typedef struct
   gsm_msg_t         msg;
 #endif
 #if (_GSM_GPRS == 1)
-  gsm_gprs_t       gprs;
+  gsm_gprs_t      	gprs;
 #endif
 
 }gsm_t;
+
+typedef struct
+{
+	char 			number[16];
+}number_t;
 
 extern  gsm_t   gsm;
 //###############################################################################################################
@@ -307,4 +312,5 @@ void            gsm_callback_gprsDisconnected(void);
 void            gsm_callback_mqttMessage(char *topic, char *message);
 void            gsm_callback_mqttDisconnect(void);
 //###############################################################################################################
+uint8_t 		gsm_number_validation(const char* number);
 #endif /* _GSM_H_ */
