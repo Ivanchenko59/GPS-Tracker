@@ -1,10 +1,10 @@
 #include "gsm.h"
 
-char	*ft_strtok(char *str, char sepa)
+char *ft_strtok(char *str, char sepa)
 {
 	static char	*stock = NULL;
-	char		*ptr;
-	int		i;
+	char *ptr;
+	int	i;
 
 	i = 0;
 	ptr = NULL;

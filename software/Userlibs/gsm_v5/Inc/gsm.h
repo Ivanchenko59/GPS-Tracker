@@ -29,6 +29,7 @@
 #include "gsmConfig.h"
 #include "atcConfig.h"
 #include "atc.h"
+#include "user.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -201,11 +202,6 @@ typedef struct
 
 }gsm_t;
 
-typedef struct
-{
-	char 			number[16];
-}number_t;
-
 extern  gsm_t   gsm;
 //###############################################################################################################
 #define         gsm_delay(x)            atc_delay(x)
@@ -312,5 +308,4 @@ void            gsm_callback_gprsDisconnected(void);
 void            gsm_callback_mqttMessage(char *topic, char *message);
 void            gsm_callback_mqttDisconnect(void);
 //###############################################################################################################
-uint8_t 		gsm_number_validation(const char* number);
 #endif /* _GSM_H_ */

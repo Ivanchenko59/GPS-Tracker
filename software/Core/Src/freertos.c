@@ -164,7 +164,7 @@ void MX_FREERTOS_Init(void) {
   gnss_queueHandle = osMessageQueueNew (2, sizeof(nmea_t), &gnss_queue_attributes);
 
   /* creation of sender_num_queue */
-  sender_num_queueHandle = osMessageQueueNew (1, sizeof(number_t), &sender_num_queue_attributes);
+  sender_num_queueHandle = osMessageQueueNew (1, sizeof(msg_data_t), &sender_num_queue_attributes);
 
   /* USER CODE BEGIN RTOS_QUEUES */
   /* add queues, ... */
@@ -253,10 +253,8 @@ void start_task_gsm(void *argument)
 void start_task_send_gsm(void *argument)
 {
   /* USER CODE BEGIN start_task_send_gsm */
-	number_t user_number = {'\0'};
-	char sms_to_send[64] = "https://www.google.com/maps/@";
-	uint8_t maps_link_len = strlen(sms_to_send);
-//	char buffer[24] = {'\0'};
+	msg_data_t user_data = {'\0'};
+	char sms_to_send[64];
 	gsm_waitForRegister(30);
 //	gsm_msg_textMode(0, 0);
 
@@ -264,13 +262,23 @@ void start_task_send_gsm(void *argument)
 	for(;;)
 	{
 		osSemaphoreAcquire(send_sms_semHandle, osWaitForever);
-		osMessageQueueGet(sender_num_queueHandle, user_number.number, 0, osWaitForever);
-////		memset after /@ to end
-		sprintf(sms_to_send + maps_link_len, "%.7f,%.7f", gps.gnss.latitude_deg, gps.gnss.longitude_deg);
-//		strcat(sms_to_send, buffer);
-//		gsm_msg_send(user_number, sms_to_send);
-		memset(sms_to_send + maps_link_len, '\0', 25);
-		memset(user_number.number, '\0', sizeof(user_number));
+		osMessageQueueGet(sender_num_queueHandle, &user_data, 0, osWaitForever);
+
+		if (gsm_number_validation(number)) {
+			if (strcmp(user_data.msg, "GET GPS") == 0) {
+				sprintf(sms_to_send, "https://www.google.com/maps/@%.7f,%.7f", gps.gnss.latitude_deg, gps.gnss.longitude_deg);
+			}
+			else if (strcmp(user_data.msg, "GET BATTERY") == 0) {
+//				sprintf(sms_to_send, "Voltage: %f", voltage);
+			}
+			else if (strcmp(user_data.msg, "GET SOMETHING") == 0) {
+
+			}
+		}
+
+//		gsm_msg_send(user_data.number, sms_to_send);
+		memset(sms_to_send, '\0', 64);
+		memset(&user_data, '\0', sizeof(user_data));
 	}
   /* USER CODE END start_task_send_gsm */
 }
