@@ -2,6 +2,9 @@
 #include "gsm.h"
 #include "cmsis_os.h"
 
+extern osMessageQueueId_t sender_num_queueHandle;
+extern osThreadId_t send_sms_semHandle;
+
 #if (_GSM_CALL == 1 || _GSM_MSG == 1 || _GSM_GPRS == 1)
 //###############################################################################################################
 void gsm_callback_simcardReady(void)
@@ -53,19 +56,19 @@ void gsm_callback_dtmf(char *string, uint8_t len)
 #endif
 //###############################################################################################################
 #if (_GSM_MSG == 1)
+
 void gsm_callback_newMsg(char *number, gsm_time_t time, char *msg)
 {
-	extern osMessageQueueId_t sender_num_queueHandle;
-	extern osThreadId_t send_sms_semHandle;
-	char buff[16] = {'\0'};
-	strcpy(buff, number);
+	number_t buffer = {'\0'};
+
+	strcpy(buffer.number, number);
 
 	gsm_printf("CALLBACK NEW MESSAGE FROM %s, LEN:%d\r\n", number, strlen(msg));
 	gsm_printf("%s\r\n", msg);
 
 //	if (gsm_number_validation(number)) {
 //		if (strcmp(msg, "GET GPS") == 0) {
-			osMessageQueuePut(sender_num_queueHandle, number, 0, osWaitForever);
+			osMessageQueuePut(sender_num_queueHandle, buffer.number, 0, osWaitForever);
 			osSemaphoreRelease(send_sms_semHandle);
 //		}
 //	}

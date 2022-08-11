@@ -54,6 +54,10 @@ FILINFO fno;
 FRESULT fresult;  // result
 UINT 	br, bw;  // File read/write count
 
+char pcWriteBuffer[1024];
+uint32_t freemem;
+
+
 /* USER CODE END Variables */
 /* Definitions for defaultTask */
 osThreadId_t defaultTaskHandle;
@@ -67,21 +71,21 @@ osThreadId_t task_gsmHandle;
 const osThreadAttr_t task_gsm_attributes = {
   .name = "task_gsm",
   .stack_size = 512 * 4,
-  .priority = (osPriority_t) osPriorityAboveNormal1,
+  .priority = (osPriority_t) osPriorityNormal,
 };
 /* Definitions for task_send_gsm */
 osThreadId_t task_send_gsmHandle;
 const osThreadAttr_t task_send_gsm_attributes = {
   .name = "task_send_gsm",
-  .stack_size = 254 * 4,
-  .priority = (osPriority_t) osPriorityNormal1,
+  .stack_size = 512 * 4,
+  .priority = (osPriority_t) osPriorityNormal,
 };
 /* Definitions for task_nmea */
 osThreadId_t task_nmeaHandle;
 const osThreadAttr_t task_nmea_attributes = {
   .name = "task_nmea",
   .stack_size = 512 * 4,
-  .priority = (osPriority_t) osPriorityNormal3,
+  .priority = (osPriority_t) osPriorityNormal,
 };
 /* Definitions for task_get_gps */
 osThreadId_t task_get_gpsHandle;
@@ -95,7 +99,7 @@ osThreadId_t task_sdcardHandle;
 const osThreadAttr_t task_sdcard_attributes = {
   .name = "task_sdcard",
   .stack_size = 512 * 4,
-  .priority = (osPriority_t) osPriorityAboveNormal,
+  .priority = (osPriority_t) osPriorityBelowNormal7,
 };
 /* Definitions for gnss_queue */
 osMessageQueueId_t gnss_queueHandle;
@@ -160,7 +164,7 @@ void MX_FREERTOS_Init(void) {
   gnss_queueHandle = osMessageQueueNew (2, sizeof(nmea_t), &gnss_queue_attributes);
 
   /* creation of sender_num_queue */
-  sender_num_queueHandle = osMessageQueueNew (1, sizeof(char*), &sender_num_queue_attributes);
+  sender_num_queueHandle = osMessageQueueNew (1, sizeof(number_t), &sender_num_queue_attributes);
 
   /* USER CODE BEGIN RTOS_QUEUES */
   /* add queues, ... */
@@ -210,7 +214,9 @@ void StartDefaultTask(void *argument)
   /* Infinite loop */
   for(;;)
   {
-    osDelay(1000);
+	  freemem = xPortGetFreeHeapSize();
+	  vTaskList(pcWriteBuffer);
+	  osDelay(2000);
   }
   /* USER CODE END StartDefaultTask */
 }
@@ -232,7 +238,7 @@ void start_task_gsm(void *argument)
 	for(;;)
 	{
 		gsm_loop();
-		osDelay(100);
+		osDelay(10);
 	}
   /* USER CODE END start_task_gsm */
 }
@@ -247,19 +253,24 @@ void start_task_gsm(void *argument)
 void start_task_send_gsm(void *argument)
 {
   /* USER CODE BEGIN start_task_send_gsm */
-	char user_number[16] = {'\0'};
+	number_t user_number = {'\0'};
 	char sms_to_send[64] = "https://www.google.com/maps/@";
+	uint8_t maps_link_len = strlen(sms_to_send);
+//	char buffer[24] = {'\0'};
 	gsm_waitForRegister(30);
-	gsm_msg_textMode(0, 0);
+//	gsm_msg_textMode(0, 0);
 
   /* Infinite loop */
 	for(;;)
 	{
 		osSemaphoreAcquire(send_sms_semHandle, osWaitForever);
-		osMessageQueueGet(sender_num_queueHandle, user_number, 0, osWaitForever);
-//		memset after /@ to end
-		sprintf(sms_to_send, "%.7f,%.7f", gps.gnss.latitude_deg, gps.gnss.longitude_deg);
+		osMessageQueueGet(sender_num_queueHandle, user_number.number, 0, osWaitForever);
+////		memset after /@ to end
+		sprintf(sms_to_send + maps_link_len, "%.7f,%.7f", gps.gnss.latitude_deg, gps.gnss.longitude_deg);
+//		strcat(sms_to_send, buffer);
 //		gsm_msg_send(user_number, sms_to_send);
+		memset(sms_to_send + maps_link_len, '\0', 25);
+		memset(user_number.number, '\0', sizeof(user_number));
 	}
   /* USER CODE END start_task_send_gsm */
 }
@@ -278,7 +289,7 @@ void start_task_nmea(void *argument)
   /* Infinite loop */
 	for(;;)
 	{
-//		nmea_loop(&gps);
+		nmea_loop(&gps);
 		osDelay(100);
 	}
   /* USER CODE END start_task_nmea */
@@ -297,10 +308,10 @@ void start_task_get_gps(void *argument)
   /* Infinite loop */
 	for(;;)
 	{
-//		if (nmea_available(&gps)) {
-//			osMessageQueuePut(gnss_queueHandle, &gps, 0, osWaitForever);
-//			nmea_available_reset(&gps);
-//		}
+		if (nmea_available(&gps)) {
+			osMessageQueuePut(gnss_queueHandle, &gps, 0, osWaitForever);
+			nmea_available_reset(&gps);
+		}
 		osDelay(2000);
 	}
   /* USER CODE END start_task_get_gps */
@@ -322,33 +333,33 @@ void start_task_sdcard(void *argument)
   /* Infinite loop */
 	for(;;)
 	{
-//		if (osMessageQueueGetCount(gnss_queueHandle)) {
-//
-//			osMessageQueueGet(gnss_queueHandle, &gnss_data, 0, osWaitForever);
-//
-//			fresult = f_mount(&fs, "", 0);
-//			if (fresult != FR_OK) {
-//				printf("Mount failed\n");
-//			}
-//
-//			fresult = f_open(&fil, "data.txt", FA_OPEN_ALWAYS | FA_WRITE);
-//			if (fresult != FR_OK) {
-//				printf("File wasn't create\n");
-//			}
-//			memset(buffer, '\0', sizeof(buffer));
-//
-//			sprintf(buffer, "%d.\t%.7f\t%.7f\n", index, gnss_data.gnss.latitude_deg, gnss_data.gnss.longitude_deg);
-//			f_lseek(&fil, f_size(&fil));
-//			f_puts(buffer, &fil);
-//			fresult = f_close(&fil);
-//			if (fresult != FR_OK) {
-//				printf("File wasn't close\n");
-//			}
-//
-//			fresult = f_mount(NULL, "", 1);
-//
-//			index++;
-//		}
+		if (osMessageQueueGetCount(gnss_queueHandle)) {
+
+			osMessageQueueGet(gnss_queueHandle, &gnss_data, 0, osWaitForever);
+
+			fresult = f_mount(&fs, "", 0);
+			if (fresult != FR_OK) {
+				printf("Mount failed\n");
+			}
+
+			fresult = f_open(&fil, "data.txt", FA_OPEN_ALWAYS | FA_WRITE);
+			if (fresult != FR_OK) {
+				printf("File wasn't create\n");
+			}
+			memset(buffer, '\0', sizeof(buffer));
+
+			sprintf(buffer, "%d.\t%.7f\t%.7f\n", index, gnss_data.gnss.latitude_deg, gnss_data.gnss.longitude_deg);
+			f_lseek(&fil, f_size(&fil));
+			f_puts(buffer, &fil);
+			fresult = f_close(&fil);
+			if (fresult != FR_OK) {
+				printf("File wasn't close\n");
+			}
+
+			fresult = f_mount(NULL, "", 1);
+
+			index++;
+		}
 
 		osDelay(1000);
 	}

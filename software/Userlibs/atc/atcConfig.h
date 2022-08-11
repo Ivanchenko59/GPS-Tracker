@@ -11,6 +11,6 @@
 #define	_ATC_RXSIZE           1024    //  at-command rx buffer size
 #define	_ATC_SEARCH_CMD_MAX   5       //  maximum of answer in at-command
 #define	_ATC_SEARCH_MAX       10      //  maximum	of always search in buffer
-#define	_ATC_RXTIMEOUT_MS     50      //  rx timeout to get new packet
+#define	_ATC_RXTIMEOUT_MS     100      //  rx timeout to get new packet
 
 #endif /* _ATCCONFIG_H_ */

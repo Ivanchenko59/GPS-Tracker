@@ -415,7 +415,6 @@ void gsm_loop(void)
       {
         for (uint16_t i = 0; i < 150; i++)
         {
-            gsm_msg_delete(21);
           if (gsm_msg_read(i))
           {
             gsm_msg_delete(i);
