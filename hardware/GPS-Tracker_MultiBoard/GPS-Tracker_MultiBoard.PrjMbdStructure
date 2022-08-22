@@ -1,6 +1,0 @@
-Record=DiagramHierarchy|SourceDocument=Schematic.MbsDoc|Kind=Multi-board Schematic Module|Designator=1|Source=..\GPS-Board\GPS-Board.PrjPcb
-Record=SubProject|SourceDocument=Schematic.MbsDoc|ProjectPath=..\GPS-Board\GPS-Board.PrjPcb
-Record=DiagramHierarchy|SourceDocument=Schematic.MbsDoc|Kind=Multi-board Schematic Module|Designator=2|Source=..\GSM-Board\GSM-Board.PrjPcb
-Record=SubProject|SourceDocument=Schematic.MbsDoc|ProjectPath=..\GSM-Board\GSM-Board.PrjPcb
-Record=DiagramHierarchy|SourceDocument=Schematic.MbsDoc|Kind=Multi-board Schematic Module|Designator=3|Source=..\MCU-Board\MCU-Board.PrjPcb
-Record=SubProject|SourceDocument=Schematic.MbsDoc|ProjectPath=..\MCU-Board\MCU-Board.PrjPcb

@@ -1,0 +1,3 @@
+Record=TopLevelDocument|FileName=GPS-Board.SchDoc|SheetNumber=2
+Record=NoMainPathDocument|SourceDocument=GPS-Board.SchDoc|FileName=GSM-Board.SchDoc|SheetNumber=3
+Record=NoMainPathDocument|SourceDocument=GPS-Board.SchDoc|FileName=MCU-Board.SchDoc|SheetNumber=1
