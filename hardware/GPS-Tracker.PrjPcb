@@ -1114,8 +1114,11 @@ ModelType0=PCBLIB
 ModelName0=CON: PLD-10
 ModelUpdate0=1
 ModelType1=PCBLIB
-ModelName1=CON: PLS-4R
+ModelName1=CON: PLS-4
 ModelUpdate1=1
+ModelType2=PCBLIB
+ModelName2=CON: PLS-4R
+ModelUpdate2=1
 
 [DatabaseUpdateOptions]
 SelectedOnly=0
