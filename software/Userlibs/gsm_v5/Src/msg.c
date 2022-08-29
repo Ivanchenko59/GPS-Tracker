@@ -376,12 +376,12 @@ bool gsm_msg_read(uint16_t index)
     gsm.msg.time.minute = d[4];
     gsm.msg.time.second = d[5];
     uint8_t cnt = 0;
-//    char *s = strtok((char*) gsm.buffer, "\"");
-    char *s = ft_strtok((char*) gsm.buffer, '\"');
+    char *s = strtok((char*) gsm.buffer, "\"");
+//    char *s = ft_strtok((char*) gsm.buffer, '\"');
     while (s != NULL)
     {
-//      s = strtok(NULL, "\"");
-      s = ft_strtok(NULL, '\"');
+      s = strtok(NULL, "\"");
+//      s = ft_strtok(NULL, '\"');
       if (cnt == 6)
       {
         s += 2;

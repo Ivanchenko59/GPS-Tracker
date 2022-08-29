@@ -56,7 +56,7 @@ UINT 	br, bw;  // File read/write count
 
 char pcWriteBuffer[1024];
 uint32_t freemem;
-
+extern gps_is_ready;
 
 /* USER CODE END Variables */
 /* Definitions for defaultTask */
@@ -70,7 +70,7 @@ const osThreadAttr_t defaultTask_attributes = {
 osThreadId_t task_gsmHandle;
 const osThreadAttr_t task_gsm_attributes = {
   .name = "task_gsm",
-  .stack_size = 512 * 4,
+  .stack_size = 1024 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
 /* Definitions for task_send_gsm */
@@ -120,6 +120,7 @@ const osSemaphoreAttr_t send_sms_sem_attributes = {
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
 int bufsize(char *buf);
+uint8_t is_sd_detect(void);
 /* USER CODE END FunctionPrototypes */
 
 void StartDefaultTask(void *argument);
@@ -209,11 +210,10 @@ void MX_FREERTOS_Init(void) {
 void StartDefaultTask(void *argument)
 {
   /* init code for USB_DEVICE */
-//  MX_USB_DEVICE_Init();
+  MX_USB_DEVICE_Init();
   /* USER CODE BEGIN StartDefaultTask */
   /* Infinite loop */
-  for(;;)
-  {
+  for(;;) {
 	  freemem = xPortGetFreeHeapSize();
 	  vTaskList(pcWriteBuffer);
 	  osDelay(2000);
@@ -233,10 +233,8 @@ void start_task_gsm(void *argument)
   /* USER CODE BEGIN start_task_gsm */
 	gsm_init();
 	gsm_power(true);
-
   /* Infinite loop */
-	for(;;)
-	{
+	for(;;) {
 		gsm_loop();
 		osDelay(10);
 	}
@@ -253,30 +251,35 @@ void start_task_gsm(void *argument)
 void start_task_send_gsm(void *argument)
 {
   /* USER CODE BEGIN start_task_send_gsm */
-	msg_data_t user_data = {'\0'};
+	msg_data_t user_data = {};
 	char sms_to_send[64];
 	gsm_waitForRegister(30);
-//	gsm_msg_textMode(0, 0);
+
+//	gsm_gprs_setApName("internet");
+//	while (gsm_gprs_connect() == 0) {
+//		osDelay(5000);
+//	}
+//	while (gsm_gprs_mqttConnect("broker.mqttdashboard.com", 1883, 1, "sim800", 60, NULL, NULL, 30) == 0) {
+//		osDelay(5000);
+//	}
+//	gsm_gprs_mqttSubscribe("testtopic/bababui", 1);
+//	gsm_gprs_mqttPublish("testtopic/bababui", 1, 0, "hello");
 
   /* Infinite loop */
-	for(;;)
-	{
+	for (;;) {
+
 		osSemaphoreAcquire(send_sms_semHandle, osWaitForever);
 		osMessageQueueGet(sender_num_queueHandle, &user_data, 0, osWaitForever);
 
-		if (gsm_number_validation(number)) {
-			if (strcmp(user_data.msg, "GET GPS") == 0) {
-				sprintf(sms_to_send, "https://www.google.com/maps/@%.7f,%.7f", gps.gnss.latitude_deg, gps.gnss.longitude_deg);
-			}
-			else if (strcmp(user_data.msg, "GET BATTERY") == 0) {
+		if (strcmp(user_data.msg, "GET GPS") == 0) {
+			sprintf(sms_to_send, "https://www.google.com/maps/@%.7f,%.7f", gps.gnss.latitude_deg, gps.gnss.longitude_deg);
+		} else if (strcmp(user_data.msg, "GET BATTERY") == 0) {
 //				sprintf(sms_to_send, "Voltage: %f", voltage);
-			}
-			else if (strcmp(user_data.msg, "GET SOMETHING") == 0) {
+		} else if (strcmp(user_data.msg, "GET SOMETHING") == 0) {
 
-			}
 		}
-
 //		gsm_msg_send(user_data.number, sms_to_send);
+
 		memset(sms_to_send, '\0', 64);
 		memset(&user_data, '\0', sizeof(user_data));
 	}
@@ -314,9 +317,8 @@ void start_task_get_gps(void *argument)
 {
   /* USER CODE BEGIN start_task_get_gps */
   /* Infinite loop */
-	for(;;)
-	{
-		if (nmea_available(&gps)) {
+	for (;;) {
+		if (gps_is_ready && nmea_available(&gps)) {
 			osMessageQueuePut(gnss_queueHandle, &gps, 0, osWaitForever);
 			nmea_available_reset(&gps);
 		}
@@ -339,9 +341,8 @@ void start_task_sdcard(void *argument)
 	int index = 1;
 	char buffer[64];
   /* Infinite loop */
-	for(;;)
-	{
-		if (osMessageQueueGetCount(gnss_queueHandle)) {
+	for (;;) {
+		if (is_sd_detect() && osMessageQueueGetCount(gnss_queueHandle)) {
 
 			osMessageQueueGet(gnss_queueHandle, &gnss_data, 0, osWaitForever);
 
@@ -379,9 +380,28 @@ void start_task_sdcard(void *argument)
 int bufsize(char *buf)
 {
 	int i = 0;
-	while (*buf++ != '\0') i++;
+	while (*buf++ != '\0')
+		i++;
 	return i;
 }
+/*
+ * @brief Function for detecting SD card
+ * @retval Returns 1 if SD detect and 0 if not
+ */
+uint8_t is_sd_detect(void)
+{
+	return !HAL_GPIO_ReadPin(SD_DETECT_GPIO_Port, SD_DETECT_Pin);
+}
+
+/*
+ * @brief Function for knowing when GPS 3d fix ready
+ * @retval Returns 1 if ready and 0 if not
+ */
+uint8_t is_gps_ready(void)
+{
+//	return !HAL_GPIO_ReadPin(SD_DETECT_GPIO_Port, SD_DETECT_Pin);
+}
+
 /* USER CODE END Application */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

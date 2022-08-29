@@ -943,7 +943,7 @@ bool gsm_gprs_mqttConnect(const char *url, uint16_t port, bool cleanFlag, const 
     return false;
   }
   //  set CID to 1
-  sprintf((char*)gsm.buffer, "AT+SMCONF=\"CID\",1\r\n");  
+  sprintf((char*)gsm.buffer, "AT+SMCONF=\"CID\",1\r\n");
   if (gsm_command((char*)gsm.buffer, 1000 , NULL, 0, 2, "\r\nOK\r\n", "\r\nERROR\r\n") != 1)
   {
     gsm_printf("[GSM] gprs_mqttConnect() failed!\r\n");

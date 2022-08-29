@@ -20,8 +20,10 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "cmsis_os.h"
+#include "adc.h"
 #include "fatfs.h"
 #include "spi.h"
+#include "tim.h"
 #include "usart.h"
 #include "usb_device.h"
 #include "gpio.h"
@@ -50,7 +52,7 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-
+uint8_t gps_is_ready = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -121,9 +123,10 @@ int main(void)
   MX_GPIO_Init();
   MX_USART1_UART_Init();
   MX_USART2_UART_Init();
-  MX_SPI1_Init();
   MX_FATFS_Init();
   MX_SPI2_Init();
+  MX_ADC1_Init();
+  MX_TIM9_Init();
   /* USER CODE BEGIN 2 */
 
   HAL_Delay(100);
@@ -132,6 +135,7 @@ int main(void)
 	  MX_USB_DEVICE_Init();
 	   while(1) {}
   }
+
   /* USER CODE END 2 */
 
   /* Init scheduler */
@@ -196,6 +200,16 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+	if (GPIO_Pin == GPS_PPM_Pin) {
+		TIM9->CNT = 0;
+		gps_is_ready = 1;
+		HAL_TIM_Base_Start_IT(&htim9);
+	}
+}
+
 volatile uint8_t FatFsCnt = 0;
 volatile uint16_t Timer1, Timer2;
 
@@ -220,10 +234,18 @@ void SDTimer_Handler(void)
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
   /* USER CODE BEGIN Callback 0 */
-	FatFsCnt++;
-	if(FatFsCnt >= 10) {
-		FatFsCnt = 0;
-		SDTimer_Handler();
+	if (htim->Instance == TIM9) {
+		gps_is_ready = 0;
+		HAL_TIM_Base_Stop_IT(&htim9);
+		HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
+	}
+
+	if (htim->Instance == TIM11) {
+		FatFsCnt++;
+		if(FatFsCnt >= 10) {
+			FatFsCnt = 0;
+			SDTimer_Handler();
+		}
 	}
   /* USER CODE END Callback 0 */
   if (htim->Instance == TIM11) {

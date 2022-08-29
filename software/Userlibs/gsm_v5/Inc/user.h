@@ -12,12 +12,10 @@
 #include <string.h>
 #include <stdio.h>
 
-#define NUM_OF_NUMBERS 	2
-
 typedef struct
 {
 	char number[16];
-	char msg[32];
+	char msg[254];
 }msg_data_t;
 
 uint8_t gsm_number_validation(const char* number);
