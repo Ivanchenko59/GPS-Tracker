@@ -21,6 +21,7 @@
 #include "main.h"
 #include "cmsis_os.h"
 #include "adc.h"
+#include "dma.h"
 #include "fatfs.h"
 #include "spi.h"
 #include "tim.h"
@@ -53,6 +54,7 @@
 
 /* USER CODE BEGIN PV */
 uint8_t gps_is_ready = 0;
+extern uint8_t vbat;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -125,6 +127,7 @@ int main(void)
   MX_USART2_UART_Init();
   MX_FATFS_Init();
   MX_SPI2_Init();
+  MX_DMA_Init();
   MX_ADC1_Init();
   MX_TIM9_Init();
   /* USER CODE BEGIN 2 */
@@ -136,6 +139,7 @@ int main(void)
 	   while(1) {}
   }
 
+  HAL_ADC_Start_DMA(&hadc1, (uint32_t*)&vbat, 1);
   /* USER CODE END 2 */
 
   /* Init scheduler */

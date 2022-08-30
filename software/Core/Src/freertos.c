@@ -56,7 +56,8 @@ UINT 	br, bw;  // File read/write count
 
 char pcWriteBuffer[1024];
 uint32_t freemem;
-extern gps_is_ready;
+extern uint8_t gps_is_ready;
+uint8_t vbat;
 
 /* USER CODE END Variables */
 /* Definitions for defaultTask */
@@ -274,7 +275,7 @@ void start_task_send_gsm(void *argument)
 		if (strcmp(user_data.msg, "GET GPS") == 0) {
 			sprintf(sms_to_send, "https://www.google.com/maps/@%.7f,%.7f", gps.gnss.latitude_deg, gps.gnss.longitude_deg);
 		} else if (strcmp(user_data.msg, "GET BATTERY") == 0) {
-//				sprintf(sms_to_send, "Voltage: %f", voltage);
+				sprintf(sms_to_send, "Battery voltage: %f,V", vbat);
 		} else if (strcmp(user_data.msg, "GET SOMETHING") == 0) {
 
 		}
