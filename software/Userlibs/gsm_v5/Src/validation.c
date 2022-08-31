@@ -1,11 +1,11 @@
 /*
- * user.c
+ * validation.c
  *
  *  Created on: Aug 11, 2022
  *      Author: ivanc
  */
 
-#include "user.h"
+#include "validation.h"
 
 
 #define MAX_NUMBERS 	10

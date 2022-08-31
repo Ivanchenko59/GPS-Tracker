@@ -53,8 +53,8 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-uint8_t gps_is_ready = 0;
-extern uint8_t vbat;
+extern uint8_t gps_is_ready;
+extern uint8_t adc_bat;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -139,7 +139,7 @@ int main(void)
 	   while(1) {}
   }
 
-  HAL_ADC_Start_DMA(&hadc1, (uint32_t*)&vbat, 1);
+  HAL_ADC_Start_DMA(&hadc1, (uint32_t*)&adc_bat, 1);
   /* USER CODE END 2 */
 
   /* Init scheduler */

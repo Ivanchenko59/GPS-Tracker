@@ -29,10 +29,10 @@
 #include "gsmConfig.h"
 #include "atcConfig.h"
 #include "atc.h"
-#include "user.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <validation.h>
 
 #if (_GSM_DEBUG == 1)
 #define gsm_printf(...)     printf(__VA_ARGS__)

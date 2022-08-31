@@ -29,6 +29,7 @@
 #include "fatfs.h"
 #include "gsm.h"
 #include "nmea.h"
+#include "user_math.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -56,8 +57,8 @@ UINT 	br, bw;  // File read/write count
 
 char pcWriteBuffer[1024];
 uint32_t freemem;
-extern uint8_t gps_is_ready;
-uint8_t vbat;
+uint8_t gps_is_ready;
+uint8_t adc_bat;
 
 /* USER CODE END Variables */
 /* Definitions for defaultTask */
@@ -120,8 +121,8 @@ const osSemaphoreAttr_t send_sms_sem_attributes = {
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
-int bufsize(char *buf);
 uint8_t is_sd_detect(void);
+float get_vbat(uint32_t adc_data);
 /* USER CODE END FunctionPrototypes */
 
 void StartDefaultTask(void *argument);
@@ -211,7 +212,7 @@ void MX_FREERTOS_Init(void) {
 void StartDefaultTask(void *argument)
 {
   /* init code for USB_DEVICE */
-  MX_USB_DEVICE_Init();
+//  MX_USB_DEVICE_Init();
   /* USER CODE BEGIN StartDefaultTask */
   /* Infinite loop */
   for(;;) {
@@ -275,7 +276,7 @@ void start_task_send_gsm(void *argument)
 		if (strcmp(user_data.msg, "GET GPS") == 0) {
 			sprintf(sms_to_send, "https://www.google.com/maps/@%.7f,%.7f", gps.gnss.latitude_deg, gps.gnss.longitude_deg);
 		} else if (strcmp(user_data.msg, "GET BATTERY") == 0) {
-				sprintf(sms_to_send, "Battery voltage: %f,V", vbat);
+			sprintf(sms_to_send, "Battery voltage: %fV", get_vbat(adc_bat));
 		} else if (strcmp(user_data.msg, "GET SOMETHING") == 0) {
 
 		}
@@ -378,13 +379,7 @@ void start_task_sdcard(void *argument)
 
 /* Private application code --------------------------------------------------*/
 /* USER CODE BEGIN Application */
-int bufsize(char *buf)
-{
-	int i = 0;
-	while (*buf++ != '\0')
-		i++;
-	return i;
-}
+
 /*
  * @brief Function for detecting SD card
  * @retval Returns 1 if SD detect and 0 if not
@@ -394,15 +389,10 @@ uint8_t is_sd_detect(void)
 	return !HAL_GPIO_ReadPin(SD_DETECT_GPIO_Port, SD_DETECT_Pin);
 }
 
-/*
- * @brief Function for knowing when GPS 3d fix ready
- * @retval Returns 1 if ready and 0 if not
- */
-uint8_t is_gps_ready(void)
+float get_vbat(uint32_t adc_data)
 {
-//	return !HAL_GPIO_ReadPin(SD_DETECT_GPIO_Port, SD_DETECT_Pin);
+	return (float)GET_INPUT_VOLTAGE(map(adc_data, 0, 255, 0, 3300), R1, R2) / 1000;
 }
-
 /* USER CODE END Application */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

@@ -1,12 +1,12 @@
 /*
- * user.h
+ * validation.h
  *
  *  Created on: Aug 11, 2022
  *      Author: ivanc
  */
 
-#ifndef GSM_V5_INC_USER_H_
-#define GSM_V5_INC_USER_H_
+#ifndef GSM_V5_INC_VALIDATION_H_
+#define GSM_V5_INC_VALIDATION_H_
 
 #include <stdlib.h>
 #include <string.h>
@@ -20,4 +20,4 @@ typedef struct
 
 uint8_t gsm_number_validation(const char* number);
 
-#endif /* GSM_V5_INC_USER_H_ */
+#endif /* GSM_V5_INC_VALIDATION_H_ */
