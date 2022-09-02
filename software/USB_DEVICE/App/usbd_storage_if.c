@@ -180,7 +180,7 @@ int8_t STORAGE_Init_FS(uint8_t lun)
 {
   /* USER CODE BEGIN 2 */
 	disk_initialize(0);
-  return (USBD_OK);
+	return (USBD_OK);
   /* USER CODE END 2 */
 }
 
@@ -198,8 +198,8 @@ int8_t STORAGE_GetCapacity_FS(uint8_t lun, uint32_t *block_num, uint16_t *block_
 //  *block_size = STORAGE_BLK_SIZ;
 	disk_ioctl(0, GET_SECTOR_COUNT, &_block_num);
 	disk_ioctl(0, GET_SECTOR_SIZE/*GET_BLOCK_SIZE*/, &_block_size);
-  *block_num = _block_num - 1;
-  *block_size = 512;
+	*block_num = _block_num - 1;
+	*block_size = 512;
   return (USBD_OK);
   /* USER CODE END 3 */
 }
@@ -212,7 +212,7 @@ int8_t STORAGE_GetCapacity_FS(uint8_t lun, uint32_t *block_num, uint16_t *block_
 int8_t STORAGE_IsReady_FS(uint8_t lun)
 {
   /* USER CODE BEGIN 4 */
-  return (USBD_OK);
+	return (USBD_OK);
   /* USER CODE END 4 */
 }
 
@@ -224,7 +224,7 @@ int8_t STORAGE_IsReady_FS(uint8_t lun)
 int8_t STORAGE_IsWriteProtected_FS(uint8_t lun)
 {
   /* USER CODE BEGIN 5 */
-  return (USBD_OK);
+	return (USBD_OK);
   /* USER CODE END 5 */
 }
 
@@ -237,7 +237,7 @@ int8_t STORAGE_Read_FS(uint8_t lun, uint8_t *buf, uint32_t blk_addr, uint16_t bl
 {
   /* USER CODE BEGIN 6 */
 	disk_read(0, buf, blk_addr, blk_len);
-  return (USBD_OK);
+	return (USBD_OK);
   /* USER CODE END 6 */
 }
 
@@ -250,7 +250,7 @@ int8_t STORAGE_Write_FS(uint8_t lun, uint8_t *buf, uint32_t blk_addr, uint16_t b
 {
   /* USER CODE BEGIN 7 */
 	disk_write(0, buf, blk_addr, blk_len);
-  return (USBD_OK);
+	return (USBD_OK);
   /* USER CODE END 7 */
 }
 
@@ -262,7 +262,7 @@ int8_t STORAGE_Write_FS(uint8_t lun, uint8_t *buf, uint32_t blk_addr, uint16_t b
 int8_t STORAGE_GetMaxLun_FS(void)
 {
   /* USER CODE BEGIN 8 */
-  return (STORAGE_LUN_NBR - 1);
+	return (STORAGE_LUN_NBR - 1);
   /* USER CODE END 8 */
 }
 

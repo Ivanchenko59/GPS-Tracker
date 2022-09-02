@@ -134,7 +134,7 @@ int main(void)
 
   HAL_Delay(100);
 
-  if (HAL_GPIO_ReadPin(BTN_GPIO_Port, BTN_Pin) == GPIO_PIN_RESET) {
+  if (HAL_GPIO_ReadPin(USB_DETECT_GPIO_Port, USB_DETECT_Pin)) {
 	  MX_USB_DEVICE_Init();
 	   while(1) {}
   }
