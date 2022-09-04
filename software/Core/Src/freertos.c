@@ -257,6 +257,7 @@ void start_task_send_gsm(void *argument)
 	char sms_to_send[64];
 	gsm_waitForRegister(30);
 
+		char numbuffer[32] = {};
 //	gsm_gprs_setApName("internet");
 //	while (gsm_gprs_connect() == 0) {
 //		osDelay(5000);
@@ -270,8 +271,13 @@ void start_task_send_gsm(void *argument)
   /* Infinite loop */
 	for (;;) {
 
-		osSemaphoreAcquire(send_sms_semHandle, osWaitForever);
-		osMessageQueueGet(sender_num_queueHandle, &user_data, 0, osWaitForever);
+
+		gsm_getPhonebookNumber(1, numbuffer);
+		int status = gsm_isNumberExistInPhonebook("1123456", 9, 30);
+		osDelay(2000);
+
+//		osSemaphoreAcquire(send_sms_semHandle, osWaitForever);
+//		osMessageQueueGet(sender_num_queueHandle, &user_data, 0, osWaitForever);
 
 		if (strcmp(user_data.msg, "GET GPS") == 0) {
 			sprintf(sms_to_send, "https://www.google.com/maps/@%.7f,%.7f", gps.gnss.latitude_deg, gps.gnss.longitude_deg);

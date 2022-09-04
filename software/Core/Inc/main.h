@@ -72,8 +72,8 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define BTN_Pin GPIO_PIN_0
 #define BTN_GPIO_Port GPIOA
-#define GSM_UART_TX_Pin GPIO_PIN_2
-#define GSM_UART_TX_GPIO_Port GPIOA
+#define GSM_USART_TX_Pin GPIO_PIN_2
+#define GSM_USART_TX_GPIO_Port GPIOA
 #define GSM_USART_RX_Pin GPIO_PIN_3
 #define GSM_USART_RX_GPIO_Port GPIOA
 #define PWRKEY_GSM_Pin GPIO_PIN_4

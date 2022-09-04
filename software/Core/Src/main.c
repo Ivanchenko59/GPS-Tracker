@@ -134,10 +134,10 @@ int main(void)
 
   HAL_Delay(100);
 
-  if (HAL_GPIO_ReadPin(USB_DETECT_GPIO_Port, USB_DETECT_Pin)) {
-	  MX_USB_DEVICE_Init();
-	   while(1) {}
-  }
+//  if (HAL_GPIO_ReadPin(USB_DETECT_GPIO_Port, USB_DETECT_Pin)) {
+//	  MX_USB_DEVICE_Init();
+//	   while(1) {}
+//  }
 
   HAL_ADC_Start_DMA(&hadc1, (uint32_t*)&adc_bat, 1);
   /* USER CODE END 2 */
@@ -210,7 +210,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 	if (GPIO_Pin == GPS_PPM_Pin) {
 		TIM9->CNT = 0;
 		gps_is_ready = 1;
-		HAL_TIM_Base_Start_IT(&htim9);
+//		HAL_TIM_Base_Start_IT(&htim9);
 	}
 }
 
@@ -240,8 +240,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   /* USER CODE BEGIN Callback 0 */
 	if (htim->Instance == TIM9) {
 		gps_is_ready = 0;
-		HAL_TIM_Base_Stop_IT(&htim9);
-		HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
+//		HAL_TIM_Base_Stop_IT(&htim9);
+//		HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
 	}
 
 	if (htim->Instance == TIM11) {
