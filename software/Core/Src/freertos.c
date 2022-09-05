@@ -61,10 +61,10 @@ uint8_t gps_is_ready;
 uint8_t adc_bat;
 
 /* USER CODE END Variables */
-/* Definitions for defaultTask */
-osThreadId_t defaultTaskHandle;
-const osThreadAttr_t defaultTask_attributes = {
-  .name = "defaultTask",
+/* Definitions for mqtt_task */
+osThreadId_t mqtt_taskHandle;
+const osThreadAttr_t mqtt_task_attributes = {
+  .name = "mqtt_task",
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
@@ -125,14 +125,13 @@ uint8_t is_sd_detect(void);
 float get_vbat(uint32_t adc_data);
 /* USER CODE END FunctionPrototypes */
 
-void StartDefaultTask(void *argument);
+void start_mqtt_task(void *argument);
 void start_task_gsm(void *argument);
 void start_task_send_gsm(void *argument);
 void start_task_nmea(void *argument);
 void start_task_get_gps(void *argument);
 void start_task_sdcard(void *argument);
 
-extern void MX_USB_DEVICE_Init(void);
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
 /**
@@ -174,8 +173,8 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE END RTOS_QUEUES */
 
   /* Create the thread(s) */
-  /* creation of defaultTask */
-  defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
+  /* creation of mqtt_task */
+  mqtt_taskHandle = osThreadNew(start_mqtt_task, NULL, &mqtt_task_attributes);
 
   /* creation of task_gsm */
   task_gsmHandle = osThreadNew(start_task_gsm, NULL, &task_gsm_attributes);
@@ -202,25 +201,32 @@ void MX_FREERTOS_Init(void) {
 
 }
 
-/* USER CODE BEGIN Header_StartDefaultTask */
+/* USER CODE BEGIN Header_start_mqtt_task */
 /**
-* @brief Function implementing the defaultTask thread.
-* @param argument: Not used
-* @retval None
-*/
-/* USER CODE END Header_StartDefaultTask */
-void StartDefaultTask(void *argument)
+  * @brief  Function implementing the mqtt_task thread.
+  * @param  argument: Not used
+  * @retval None
+  */
+/* USER CODE END Header_start_mqtt_task */
+void start_mqtt_task(void *argument)
 {
-  /* init code for USB_DEVICE */
-//  MX_USB_DEVICE_Init();
-  /* USER CODE BEGIN StartDefaultTask */
+  /* USER CODE BEGIN start_mqtt_task */
   /* Infinite loop */
-  for(;;) {
-	  freemem = xPortGetFreeHeapSize();
-	  vTaskList(pcWriteBuffer);
-	  osDelay(2000);
+  for(;;)
+  {
+//  	gsm_gprs_setApName("internet");
+//  	while (gsm_gprs_connect() == 0) {
+//  		osDelay(5000);
+//  	}
+//  	while (gsm_gprs_mqttConnect("broker.mqttdashboard.com", 1883, 1, "sim800", 60, NULL, NULL, 30) == 0) {
+//  		osDelay(5000);
+//  	}
+//  	gsm_gprs_mqttSubscribe("testtopic/bababui", 1);
+//  	gsm_gprs_mqttPublish("testtopic/bababui", 1, 0, "hello");
+
+    osDelay(10000);
   }
-  /* USER CODE END StartDefaultTask */
+  /* USER CODE END start_mqtt_task */
 }
 
 /* USER CODE BEGIN Header_start_task_gsm */
@@ -256,31 +262,14 @@ void start_task_send_gsm(void *argument)
 	msg_data_t user_data = {};
 	char sms_to_send[64];
 	gsm_waitForRegister(30);
-
-		char numbuffer[32] = {};
-//	gsm_gprs_setApName("internet");
-//	while (gsm_gprs_connect() == 0) {
-//		osDelay(5000);
-//	}
-//	while (gsm_gprs_mqttConnect("broker.mqttdashboard.com", 1883, 1, "sim800", 60, NULL, NULL, 30) == 0) {
-//		osDelay(5000);
-//	}
-//	gsm_gprs_mqttSubscribe("testtopic/bababui", 1);
-//	gsm_gprs_mqttPublish("testtopic/bababui", 1, 0, "hello");
-
   /* Infinite loop */
 	for (;;) {
-
-
-		gsm_getPhonebookNumber(1, numbuffer);
-		int status = gsm_isNumberExistInPhonebook("1123456", 9, 30);
-		osDelay(2000);
-
-//		osSemaphoreAcquire(send_sms_semHandle, osWaitForever);
-//		osMessageQueueGet(sender_num_queueHandle, &user_data, 0, osWaitForever);
+		osSemaphoreAcquire(send_sms_semHandle, osWaitForever);
+		osMessageQueueGet(sender_num_queueHandle, &user_data, 0, osWaitForever);
 
 		if (strcmp(user_data.msg, "GET GPS") == 0) {
-			sprintf(sms_to_send, "https://www.google.com/maps/@%.7f,%.7f", gps.gnss.latitude_deg, gps.gnss.longitude_deg);
+			sprintf(sms_to_send, "https://www.google.com/maps/@%.7f,%.7f"
+				, gps.gnss.latitude_deg, gps.gnss.longitude_deg);
 		} else if (strcmp(user_data.msg, "GET BATTERY") == 0) {
 			sprintf(sms_to_send, "Battery voltage: %fV", get_vbat(adc_bat));
 		} else if (strcmp(user_data.msg, "GET SOMETHING") == 0) {

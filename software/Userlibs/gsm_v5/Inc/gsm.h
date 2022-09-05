@@ -32,7 +32,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include <validation.h>
 
 #if (_GSM_DEBUG == 1)
 #define gsm_printf(...)     printf(__VA_ARGS__)
@@ -203,6 +202,15 @@ typedef struct
 }gsm_t;
 
 extern  gsm_t   gsm;
+
+//################# USER STRUCT##################################################################################
+
+typedef struct
+{
+	char number[16];
+	char msg[64];
+}msg_data_t;
+
 //###############################################################################################################
 #define         gsm_delay(x)            atc_delay(x)
 #define         gsm_command(...)        atc_command(&gsm.atc, __VA_ARGS__)

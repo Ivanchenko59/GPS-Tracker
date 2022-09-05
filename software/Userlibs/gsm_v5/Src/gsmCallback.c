@@ -58,15 +58,17 @@ void gsm_callback_dtmf(char *string, uint8_t len)
 
 void gsm_callback_newMsg(char *number, gsm_time_t time, char *msg)
 {
-	msg_data_t buffer = {'\0'};
-	strcpy(buffer.number, number);
-	strcpy(buffer.msg, msg);
+	if (gsm_isNumberExistInPhonebook(number, 1, 10)) {
+		msg_data_t buffer = {};
+		strcpy(buffer.number, number);
+		strcpy(buffer.msg, msg);
 
-	gsm_printf("CALLBACK NEW MESSAGE FROM %s, LEN:%d\r\n", number, strlen(msg));
-	gsm_printf("%s\r\n", msg);
+		gsm_printf("CALLBACK NEW MESSAGE FROM %s, LEN:%d\r\n", number, strlen(msg));
+		gsm_printf("%s\r\n", msg);
 
-	osMessageQueuePut(sender_num_queueHandle, &buffer, 0, osWaitForever);
-	osSemaphoreRelease(send_sms_semHandle);
+		osMessageQueuePut(sender_num_queueHandle, &buffer, 0, osWaitForever);
+		osSemaphoreRelease(send_sms_semHandle);
+	}
 }
 #endif
 //###############################################################################################################
