@@ -13,6 +13,7 @@
 
 #define GET_INPUT_VOLTAGE(vout, r1, r2) (((vout) * (r1 + r2)) / (r2))
 
+uint16_t get_adc_resolution(ADC_HandleTypeDef *hadc);
 uint32_t map(uint32_t x, uint32_t in_min, uint32_t in_max, uint32_t out_min, uint32_t out_max);
 
 

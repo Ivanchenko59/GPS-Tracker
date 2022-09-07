@@ -35,6 +35,8 @@
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
 nmea_t gps = {0};
+
+extern ADC_HandleTypeDef hadc1;
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -389,7 +391,8 @@ uint8_t is_sd_detect(void)
 
 float get_vbat(uint32_t adc_data)
 {
-	return (float)GET_INPUT_VOLTAGE(map(adc_data, 0, 255, 0, 3300), R1, R2) / 1000;
+	uint16_t max_adc_size = get_adc_resolution(&hadc1);
+	return (float)GET_INPUT_VOLTAGE(map(adc_data, 0, max_adc_size, 0, 3300), R1, R2) / 1000;
 }
 /* USER CODE END Application */
 
