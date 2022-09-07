@@ -58,7 +58,7 @@ UINT 	br, bw;  // File read/write count
 char pcWriteBuffer[1024];
 uint32_t freemem;
 uint8_t gps_is_ready;
-uint8_t adc_bat;
+uint16_t adc_bat;
 
 /* USER CODE END Variables */
 /* Definitions for mqtt_task */
@@ -132,6 +132,7 @@ void start_task_nmea(void *argument);
 void start_task_get_gps(void *argument);
 void start_task_sdcard(void *argument);
 
+extern void MX_USB_DEVICE_Init(void);
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
 /**
@@ -210,6 +211,8 @@ void MX_FREERTOS_Init(void) {
 /* USER CODE END Header_start_mqtt_task */
 void start_mqtt_task(void *argument)
 {
+  /* init code for USB_DEVICE */
+//  MX_USB_DEVICE_Init();
   /* USER CODE BEGIN start_mqtt_task */
   /* Infinite loop */
   for(;;)

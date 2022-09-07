@@ -54,7 +54,7 @@
 
 /* USER CODE BEGIN PV */
 extern uint8_t gps_is_ready;
-extern uint8_t adc_bat;
+extern uint16_t adc_bat;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -130,6 +130,7 @@ int main(void)
   MX_DMA_Init();
   MX_ADC1_Init();
   MX_TIM9_Init();
+  MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
 
   HAL_Delay(100);
@@ -138,7 +139,7 @@ int main(void)
 //	  MX_USB_DEVICE_Init();
 //	   while(1) {}
 //  }
-
+  HAL_TIM_Base_Start(&htim2);
   HAL_ADC_Start_DMA(&hadc1, (uint32_t*)&adc_bat, 1);
   /* USER CODE END 2 */
 
