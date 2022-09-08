@@ -93,6 +93,12 @@ PUTCHAR_PROTOTYPE
 }
 #endif
 
+
+static inline void batt_data_update_time(uint32_t ms)
+{
+	__HAL_TIM_SET_AUTORELOAD(&htim2, (ms * 2) - 1);
+}
+
 /* USER CODE END 0 */
 
 /**
@@ -132,6 +138,9 @@ int main(void)
   MX_TIM9_Init();
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
+  __HAL_TIM_SET_PRESCALER(&htim2, (HAL_RCC_GetHCLKFreq() / 2000) - 1); /* make sure that TIM2 clocked by HCLK freq */
+
+  batt_data_update_time(5000);
 
   HAL_Delay(100);
 
