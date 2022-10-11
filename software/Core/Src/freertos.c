@@ -34,7 +34,7 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-nmea_t gps = {0};
+nmea_t gps;
 
 extern ADC_HandleTypeDef hadc1;
 /* USER CODE END PTD */
@@ -57,7 +57,6 @@ FILINFO fno;
 FRESULT fresult;  // result
 UINT 	br, bw;  // File read/write count
 
-char pcWriteBuffer[1024];
 uint32_t freemem;
 uint8_t gps_is_ready;
 uint16_t adc_bat;
@@ -82,14 +81,14 @@ osThreadId_t task_send_gsmHandle;
 const osThreadAttr_t task_send_gsm_attributes = {
   .name = "task_send_gsm",
   .stack_size = 512 * 4,
-  .priority = (osPriority_t) osPriorityNormal,
+  .priority = (osPriority_t) osPriorityAboveNormal,
 };
 /* Definitions for task_nmea */
 osThreadId_t task_nmeaHandle;
 const osThreadAttr_t task_nmea_attributes = {
   .name = "task_nmea",
   .stack_size = 512 * 4,
-  .priority = (osPriority_t) osPriorityNormal,
+  .priority = (osPriority_t) osPriorityAboveNormal,
 };
 /* Definitions for task_get_gps */
 osThreadId_t task_get_gpsHandle;
@@ -214,7 +213,7 @@ void MX_FREERTOS_Init(void) {
 void start_mqtt_task(void *argument)
 {
   /* init code for USB_DEVICE */
-//  MX_USB_DEVICE_Init();
+  MX_USB_DEVICE_Init();
   /* USER CODE BEGIN start_mqtt_task */
   /* Infinite loop */
   for(;;)
@@ -244,11 +243,11 @@ void start_mqtt_task(void *argument)
 void start_task_gsm(void *argument)
 {
   /* USER CODE BEGIN start_task_gsm */
-	gsm_init();
-	gsm_power(true);
+//	gsm_init();
+//	gsm_power(true);
   /* Infinite loop */
 	for(;;) {
-		gsm_loop();
+//		gsm_loop();
 		osDelay(10);
 	}
   /* USER CODE END start_task_gsm */
@@ -266,7 +265,7 @@ void start_task_send_gsm(void *argument)
   /* USER CODE BEGIN start_task_send_gsm */
 	msg_data_t user_data = {};
 	char sms_to_send[64];
-	gsm_waitForRegister(30);
+//	gsm_waitForRegister(30);
   /* Infinite loop */
 	for (;;) {
 		osSemaphoreAcquire(send_sms_semHandle, osWaitForever);
@@ -303,7 +302,7 @@ void start_task_nmea(void *argument)
 	for(;;)
 	{
 		nmea_loop(&gps);
-		osDelay(100);
+		osDelay(1000);
 	}
   /* USER CODE END start_task_nmea */
 }
@@ -321,8 +320,8 @@ void start_task_get_gps(void *argument)
   /* Infinite loop */
 	for (;;) {
 		if (gps_is_ready && nmea_available(&gps)) {
-			osMessageQueuePut(gnss_queueHandle, &gps, 0, osWaitForever);
 			nmea_available_reset(&gps);
+//			osMessageQueuePut(gnss_queueHandle, &gps, 0, 100);
 		}
 		osDelay(2000);
 	}
@@ -344,33 +343,33 @@ void start_task_sdcard(void *argument)
 	char buffer[64];
   /* Infinite loop */
 	for (;;) {
-		if (is_sd_detect() && osMessageQueueGetCount(gnss_queueHandle)) {
-
-			osMessageQueueGet(gnss_queueHandle, &gnss_data, 0, osWaitForever);
-
-			fresult = f_mount(&fs, "", 0);
-			if (fresult != FR_OK) {
-				printf("Mount failed\n");
-			}
-
-			fresult = f_open(&fil, "data.txt", FA_OPEN_ALWAYS | FA_WRITE);
-			if (fresult != FR_OK) {
-				printf("File wasn't create\n");
-			}
-			memset(buffer, '\0', sizeof(buffer));
-
-			sprintf(buffer, "%d.\t%.7f\t%.7f\n", index, gnss_data.gnss.latitude_deg, gnss_data.gnss.longitude_deg);
-			f_lseek(&fil, f_size(&fil));
-			f_puts(buffer, &fil);
-			fresult = f_close(&fil);
-			if (fresult != FR_OK) {
-				printf("File wasn't close\n");
-			}
-
-			fresult = f_mount(NULL, "", 1);
-
-			index++;
-		}
+//		if (is_sd_detect() && osMessageQueueGetCount(gnss_queueHandle)) {
+//
+//			osMessageQueueGet(gnss_queueHandle, &gnss_data, 0, osWaitForever);
+//
+//			fresult = f_mount(&fs, "", 0);
+//			if (fresult != FR_OK) {
+//				printf("Mount failed\n");
+//			}
+//
+//			fresult = f_open(&fil, "data.txt", FA_OPEN_ALWAYS | FA_WRITE);
+//			if (fresult != FR_OK) {
+//				printf("File wasn't create\n");
+//			}
+//			memset(buffer, '\0', sizeof(buffer));
+//
+//			sprintf(buffer, "%d.\t%.7f\t%.7f\n", index, gnss_data.gnss.latitude_deg, gnss_data.gnss.longitude_deg);
+//			f_lseek(&fil, f_size(&fil));
+//			f_puts(buffer, &fil);
+//			fresult = f_close(&fil);
+//			if (fresult != FR_OK) {
+//				printf("File wasn't close\n");
+//			}
+//
+//			fresult = f_mount(NULL, "", 1);
+//
+//			index++;
+//		}
 
 		osDelay(1000);
 	}
