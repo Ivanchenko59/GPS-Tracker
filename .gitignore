@@ -2,7 +2,6 @@
 __Previews/
 History/
 
-
 Project\ Logs\ for\ */
 Project\ Outputs\ for\ */
 
@@ -10,3 +9,6 @@ Project\ Outputs\ for\ */
 GPS-Tracker\ Debug.launch
 Debug/
 Release/
+
+
+photos/
