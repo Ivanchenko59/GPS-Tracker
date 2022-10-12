@@ -8,8 +8,8 @@
 #ifndef __MATH_H
 #define __MATH_H
 
-#define R1	1000
-#define R2	4700
+#define R1	10000
+#define R2	33000
 
 #define GET_INPUT_VOLTAGE(vout, r1, r2) (((vout) * (r1 + r2)) / (r2))
 

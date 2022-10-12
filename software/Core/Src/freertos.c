@@ -213,7 +213,7 @@ void MX_FREERTOS_Init(void) {
 void start_mqtt_task(void *argument)
 {
   /* init code for USB_DEVICE */
-  MX_USB_DEVICE_Init();
+//  MX_USB_DEVICE_Init();
   /* USER CODE BEGIN start_mqtt_task */
   /* Infinite loop */
   for(;;)
@@ -243,11 +243,11 @@ void start_mqtt_task(void *argument)
 void start_task_gsm(void *argument)
 {
   /* USER CODE BEGIN start_task_gsm */
-//	gsm_init();
-//	gsm_power(true);
+	gsm_init();
+	gsm_power(true);
   /* Infinite loop */
 	for(;;) {
-//		gsm_loop();
+		gsm_loop();
 		osDelay(10);
 	}
   /* USER CODE END start_task_gsm */
@@ -265,7 +265,7 @@ void start_task_send_gsm(void *argument)
   /* USER CODE BEGIN start_task_send_gsm */
 	msg_data_t user_data = {};
 	char sms_to_send[64];
-//	gsm_waitForRegister(30);
+	gsm_waitForRegister(30);
   /* Infinite loop */
 	for (;;) {
 		osSemaphoreAcquire(send_sms_semHandle, osWaitForever);
@@ -321,7 +321,7 @@ void start_task_get_gps(void *argument)
 	for (;;) {
 		if (gps_is_ready && nmea_available(&gps)) {
 			nmea_available_reset(&gps);
-//			osMessageQueuePut(gnss_queueHandle, &gps, 0, 100);
+			osMessageQueuePut(gnss_queueHandle, &gps, 0, 100);
 		}
 		osDelay(2000);
 	}
@@ -343,33 +343,33 @@ void start_task_sdcard(void *argument)
 	char buffer[64];
   /* Infinite loop */
 	for (;;) {
-//		if (is_sd_detect() && osMessageQueueGetCount(gnss_queueHandle)) {
-//
-//			osMessageQueueGet(gnss_queueHandle, &gnss_data, 0, osWaitForever);
-//
-//			fresult = f_mount(&fs, "", 0);
-//			if (fresult != FR_OK) {
-//				printf("Mount failed\n");
-//			}
-//
-//			fresult = f_open(&fil, "data.txt", FA_OPEN_ALWAYS | FA_WRITE);
-//			if (fresult != FR_OK) {
-//				printf("File wasn't create\n");
-//			}
-//			memset(buffer, '\0', sizeof(buffer));
-//
-//			sprintf(buffer, "%d.\t%.7f\t%.7f\n", index, gnss_data.gnss.latitude_deg, gnss_data.gnss.longitude_deg);
-//			f_lseek(&fil, f_size(&fil));
-//			f_puts(buffer, &fil);
-//			fresult = f_close(&fil);
-//			if (fresult != FR_OK) {
-//				printf("File wasn't close\n");
-//			}
-//
-//			fresult = f_mount(NULL, "", 1);
-//
-//			index++;
-//		}
+		if (is_sd_detect() && osMessageQueueGetCount(gnss_queueHandle)) {
+
+			osMessageQueueGet(gnss_queueHandle, &gnss_data, 0, osWaitForever);
+
+			fresult = f_mount(&fs, "", 0);
+			if (fresult != FR_OK) {
+				printf("Mount failed\n");
+			}
+
+			fresult = f_open(&fil, "data.txt", FA_OPEN_ALWAYS | FA_WRITE);
+			if (fresult != FR_OK) {
+				printf("File wasn't create\n");
+			}
+			memset(buffer, '\0', sizeof(buffer));
+
+			sprintf(buffer, "%d.\t%.7f\t%.7f\n", index, gnss_data.gnss.latitude_deg, gnss_data.gnss.longitude_deg);
+			f_lseek(&fil, f_size(&fil));
+			f_puts(buffer, &fil);
+			fresult = f_close(&fil);
+			if (fresult != FR_OK) {
+				printf("File wasn't close\n");
+			}
+
+			fresult = f_mount(NULL, "", 1);
+
+			index++;
+		}
 
 		osDelay(1000);
 	}
@@ -391,7 +391,7 @@ uint8_t is_sd_detect(void)
 float get_vbat(uint32_t adc_data)
 {
 	uint16_t max_adc_size = get_adc_resolution(&hadc1);
-	return (float)GET_INPUT_VOLTAGE(map(adc_data, 0, max_adc_size, 0, 3300), R1, R2) / 1000;
+	return (float)GET_INPUT_VOLTAGE(map(adc_data, 0, max_adc_size, 0, 3200), R1, R2) / 1000;
 }
 /* USER CODE END Application */
 

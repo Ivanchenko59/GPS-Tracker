@@ -144,10 +144,11 @@ int main(void)
 
   HAL_Delay(100);
 
-//  if (HAL_GPIO_ReadPin(USB_DETECT_GPIO_Port, USB_DETECT_Pin)) {
-//	  MX_USB_DEVICE_Init();
-//	   while(1) {}
-//  }
+  if (HAL_GPIO_ReadPin(USB_DETECT_GPIO_Port, USB_DETECT_Pin)) {
+	  MX_USB_DEVICE_Init();
+	   while(1) {}
+  }
+
   HAL_TIM_Base_Start(&htim2);
   HAL_ADC_Start_DMA(&hadc1, (uint32_t*)&adc_bat, 1);
   /* USER CODE END 2 */
