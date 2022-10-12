@@ -34,7 +34,7 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-nmea_t gps = {0};
+nmea_t gps;
 
 extern ADC_HandleTypeDef hadc1;
 /* USER CODE END PTD */
@@ -57,7 +57,6 @@ FILINFO fno;
 FRESULT fresult;  // result
 UINT 	br, bw;  // File read/write count
 
-char pcWriteBuffer[1024];
 uint32_t freemem;
 uint8_t gps_is_ready;
 uint16_t adc_bat;
@@ -82,14 +81,14 @@ osThreadId_t task_send_gsmHandle;
 const osThreadAttr_t task_send_gsm_attributes = {
   .name = "task_send_gsm",
   .stack_size = 512 * 4,
-  .priority = (osPriority_t) osPriorityNormal,
+  .priority = (osPriority_t) osPriorityAboveNormal,
 };
 /* Definitions for task_nmea */
 osThreadId_t task_nmeaHandle;
 const osThreadAttr_t task_nmea_attributes = {
   .name = "task_nmea",
   .stack_size = 512 * 4,
-  .priority = (osPriority_t) osPriorityNormal,
+  .priority = (osPriority_t) osPriorityAboveNormal,
 };
 /* Definitions for task_get_gps */
 osThreadId_t task_get_gpsHandle;
@@ -303,7 +302,7 @@ void start_task_nmea(void *argument)
 	for(;;)
 	{
 		nmea_loop(&gps);
-		osDelay(100);
+		osDelay(1000);
 	}
   /* USER CODE END start_task_nmea */
 }
@@ -321,8 +320,8 @@ void start_task_get_gps(void *argument)
   /* Infinite loop */
 	for (;;) {
 		if (gps_is_ready && nmea_available(&gps)) {
-			osMessageQueuePut(gnss_queueHandle, &gps, 0, osWaitForever);
 			nmea_available_reset(&gps);
+			osMessageQueuePut(gnss_queueHandle, &gps, 0, 100);
 		}
 		osDelay(2000);
 	}
@@ -392,7 +391,7 @@ uint8_t is_sd_detect(void)
 float get_vbat(uint32_t adc_data)
 {
 	uint16_t max_adc_size = get_adc_resolution(&hadc1);
-	return (float)GET_INPUT_VOLTAGE(map(adc_data, 0, max_adc_size, 0, 3300), R1, R2) / 1000;
+	return (float)GET_INPUT_VOLTAGE(map(adc_data, 0, max_adc_size, 0, 3200), R1, R2) / 1000;
 }
 /* USER CODE END Application */
 
